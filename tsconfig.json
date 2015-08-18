@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "target": "es6",
+    "isolatedModules": false,
+    "jsx": "react",
+    "experimentalDecorators": true,
+    "experimentalAsyncFunctions": true,
+    "emitDecoratorMetadata": true,
+    "preserveConstEnums": true,
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "./out/js",
+    "suppressImplicitAnyIndexErrors": true
+  },
+  "filesGlob": [
+    "./src/**/*.ts",
+    "./src/**/*.tsx",
+    "./tools/typings/**/*.d.ts",
+    "!./node_modules/**/*",
+    "!./out/**/*",
+    "!./tests/out/**/*",
+    "!./electron/**/*"
+  ]
+}
