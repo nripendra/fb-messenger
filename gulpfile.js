@@ -9,6 +9,7 @@ var atom = require('gulp-atom'),
     glob = require('glob'),
     gulp = require('gulp'),
     inject = require('gulp-inject'),
+    insert = require('gulp-insert'),
     jasmine = require('gulp-jasmine'),
     less = require('gulp-less'),
     source = require('vinyl-source-stream'),
@@ -65,22 +66,22 @@ gulp.task('compile-ts', ['gen-ts-refs'], function () {
         .pipe(gulp.dest(config.tsOutputPath))
 });
 
-gulp.task('browserify', ['compile-ts'], function () {
+gulp.task('append-runner', ['compile-ts'], function () {
+    return gulp.src(config.tsOutputPath + "program.js")
+        .pipe(insert.append('\n\ndocument.addEventListener("DOMContentLoaded", function(e){require("./Program").main();});'))
+        .pipe(gulp.dest(config.tsOutputPath))
+});
+
+gulp.task('browserify', ['append-runner'], function () {
     var babelifyStep = babelify.configure({stage: 0});
 
-    var allFiles = glob.sync(this.tsOutputPath + '**/*.js', {ignore: this.tsOutputPath + 'index.js'});
+    var allFiles = glob.sync(config.tsOutputPath + "**/*.js", {ignore: config.tsOutputPath + 'index.js'});
     var bundler = new Browserify({
         entries: allFiles,
-        debug: true,
-        transform: [babelifyStep],
+        transform: [ babelifyStep ]
     });
-
     return bundler
-        .require(config.tsOutputPath + 'Program.js', {expose: 'Program'})
         .bundle()
-        .on('error', function (error) {
-            console.error(error.toString());
-        })
         .pipe(source('program.js'))
         .pipe(gulp.dest(config.compiled));
 });
