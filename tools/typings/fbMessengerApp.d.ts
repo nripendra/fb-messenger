@@ -4,4 +4,6 @@
 
 /// <reference path="../../src/program.tsx" />
 
+/// <reference path="../../src/components/app.tsx" />
+
 //}

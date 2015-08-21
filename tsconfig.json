@@ -1,25 +1,33 @@
 {
-  "compilerOptions": {
-    "noImplicitAny": true,
-    "target": "es6",
-    "isolatedModules": false,
-    "jsx": "react",
-    "experimentalDecorators": true,
-    "experimentalAsyncFunctions": true,
-    "emitDecoratorMetadata": true,
-    "preserveConstEnums": true,
-    "declaration": true,
-    "sourceMap": true,
-    "outDir": "./out/js",
-    "suppressImplicitAnyIndexErrors": true
-  },
-  "filesGlob": [
-    "./src/**/*.ts",
-    "./src/**/*.tsx",
-    "./tools/typings/**/*.d.ts",
-    "!./node_modules/**/*",
-    "!./out/**/*",
-    "!./tests/out/**/*",
-    "!./electron/**/*"
-  ]
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "target": "es6",
+        "isolatedModules": false,
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "experimentalAsyncFunctions": true,
+        "emitDecoratorMetadata": true,
+        "preserveConstEnums": true,
+        "declaration": true,
+        "sourceMap": true,
+        "outDir": "./out/js",
+        "suppressImplicitAnyIndexErrors": true
+    },
+    "filesGlob": [
+        "./src/**/*.ts",
+        "./src/**/*.tsx",
+        "./tools/typings/**/*.d.ts",
+        "!./node_modules/**/*",
+        "!./out/**/*",
+        "!./tests/out/**/*",
+        "!./electron/**/*"
+    ],
+    "files": [
+        "./src/index.ts",
+        "./src/components/app.tsx",
+        "./src/program.tsx",
+        "./tools/typings/fbMessengerApp.d.ts",
+        "./tools/typings/node/node.d.ts",
+        "./tools/typings/react/react.d.ts"
+    ]
 }
