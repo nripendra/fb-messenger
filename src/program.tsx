@@ -1,5 +1,5 @@
 export default class Program {
     static main() {
-        console.log("in")
+        console.log("Hello from electron!!")
     }
 }
