@@ -16,6 +16,8 @@
     "filesGlob": [
         "./src/**/*.ts",
         "./src/**/*.tsx",
+        "./tests/**/*.ts",
+        "./tests/**/*.tsx",
         "./tools/typings/**/*.d.ts",
         "!./node_modules/**/*",
         "!./out/**/*",
@@ -23,10 +25,21 @@
         "!./electron/**/*"
     ],
     "files": [
+        "./src/actions/loginactions.ts",
+        "./src/appdispatcher.ts",
+        "./src/appstores.ts",
         "./src/index.ts",
+        "./src/stores/loginstore.ts",
         "./src/components/app.tsx",
+        "./src/components/login.tsx",
+        "./src/decorators/connectToStores.tsx",
         "./src/program.tsx",
+        "./tests/specs/app.spec.tsx",
+        "./tests/specs/login.spec.tsx",
+        "./tools/typings/delorean/delorean.d.ts",
         "./tools/typings/fbMessengerApp.d.ts",
+        "./tools/typings/jasmine/jasmine.d.ts",
+        "./tools/typings/jsdom/jsdom.d.ts",
         "./tools/typings/node/node.d.ts",
         "./tools/typings/react/react.d.ts"
     ]

@@ -22,6 +22,28 @@ var atom = require('gulp-atom'),
 var config = new Config();
 var tsconfig = tsc.createProject('tsconfig.json', {typescript: typescript});
 
+gulp.task('compile-test', function(){
+  var sourceTsFiles = ["./tests/specs/**/*.{ts,tsx}",
+  "./tools/typings/**/*.ts",
+  "./src/**/*.{ts,tsx}",
+  config.appTypeScriptReferences];
+
+  var tsResult = gulp.src(sourceTsFiles)
+      .pipe(tsc(tsconfig));
+
+  tsResult.dts.pipe(gulp.dest("./tests/out/"));
+
+  return tsResult.js
+      .pipe(babel({stage: 0}))
+      .pipe(gulp.dest("./tests/out/"))
+});
+
+gulp.task('test', ['compile-test'], function(){
+  process.env.NODE_ENV = 'development';
+  return gulp.src('./tests/out/tests/specs/**/*.js')
+      .pipe(jasmine({includeStackTrace: true}));
+});
+
 /**
  * Remove all generated JavaScript files from TypeScript compilation.
  */
