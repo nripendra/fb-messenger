@@ -16,6 +16,8 @@
 
 /// <reference path="../../src/decorators/connectToStores.tsx" />
 
+/// <reference path="../../src/services/loginservice.ts" />
+
 /// <reference path="../../src/stores/loginstore.ts" />
 
 //}

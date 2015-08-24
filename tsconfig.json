@@ -29,6 +29,7 @@
         "./src/appdispatcher.ts",
         "./src/appstores.ts",
         "./src/index.ts",
+        "./src/services/loginservice.ts",
         "./src/stores/loginstore.ts",
         "./src/components/app.tsx",
         "./src/components/login.tsx",

@@ -2,6 +2,7 @@
 import Login from '../../src/components/login';
 import AppStores from '../../src/appstores';
 import LoginActions from '../../src/actions/loginactions';
+import LoginService from '../../src/services/loginservice';
 
 import * as jsdom from 'jsdom';
 let React = require('react/addons');
@@ -21,8 +22,8 @@ describe("Login", () => {
             credential: ""
         });
         var loginForm = React.render(<Login store={AppStores.loginStore} />, document.body);
-        expect(React.findDOMNode(loginForm.refs["usernameError"]).innerHTML.length).toBeGreaterThan(0);
-        expect(React.findDOMNode(loginForm.refs["passwordError"]).innerHTML.length).toBeGreaterThan(0);
+        expect(React.findDOMNode(loginForm.refs["usernameError"]).innerHTML).toEqual("Username cannot be empty");
+        expect(React.findDOMNode(loginForm.refs["passwordError"]).innerHTML).toEqual("password cannot be empty");
         expect(React.findDOMNode(loginForm.refs["credentialError"]).innerHTML.length).toBe(0);
     });
 
@@ -31,7 +32,7 @@ describe("Login", () => {
         //tried pollyfilling using H5F, but react doesn't like it.
         HTMLFormElement.prototype.checkValidity = () => true;
 
-        spyOn(LoginActions, 'authenticate')
+        spyOn(LoginActions, 'authenticate');
         var loginForm = React.render(<Login store={AppStores.loginStore} />, document.body);
 
         ReactTestUtils.Simulate.click(React.findDOMNode(loginForm.refs["btnLogin"]));
@@ -44,12 +45,46 @@ describe("Login", () => {
         //tried pollyfilling using H5F, but react doesn't like it.
         HTMLFormElement.prototype.checkValidity = () => false;
 
-        spyOn(LoginActions, 'setErrors')
+        spyOn(LoginActions, 'setErrors');
+
         var loginForm = React.render(<Login store={AppStores.loginStore} />, document.body);
 
         ReactTestUtils.Simulate.click(React.findDOMNode(loginForm.refs["btnLogin"]));
 
         expect(LoginActions.setErrors).toHaveBeenCalled();
+    });
+
+    it("should call LoginService.authenticate when login button is clicked, and form is valid", () => {
+        HTMLFormElement.prototype.checkValidity = () => true;
+
+        //We don't actually want to hit facebook in our unit test
+        spyOn(LoginService.prototype, 'authenticate').and.returnValue(Promise.resolve({}));
+
+        var loginForm = React.render(<Login store={AppStores.loginStore} />, document.body);
+
+        ReactTestUtils.Simulate.click(React.findDOMNode(loginForm.refs["btnLogin"]));
+
+        expect(LoginService.prototype.authenticate).toHaveBeenCalled();
+    });
+
+    it("should warn user when username/password is wrong", (done: Function) => {
+        HTMLFormElement.prototype.checkValidity = () => true;
+
+        var rejected = Promise.reject({});
+        spyOn(LoginService.prototype, 'authenticate').and.returnValue(rejected);
+
+        var loginForm = React.render(<Login store={AppStores.loginStore} />, document.body);
+
+        ReactTestUtils.Simulate.click(React.findDOMNode(loginForm.refs["btnLogin"]));
+
+        expect(LoginService.prototype.authenticate).toHaveBeenCalled();
+
+        setTimeout(function() {
+            rejected.catch(function() {
+                expect(AppStores.loginStore.errors.credential).toEqual("Invalid username/password");
+                done();
+            })
+        }, 10);
     });
 
     beforeEach(function() {
