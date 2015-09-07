@@ -18,6 +18,7 @@ export default class LoginStore extends Store {
     isAuthenticated: boolean;
     isInProgress: boolean;
     loginService: LoginService;
+    api: any;
 
     constructor() {
         super();
@@ -54,6 +55,9 @@ export default class LoginStore extends Store {
         this.loginService.authenticate(this.credential.username, this.credential.password).then(function(response: any) {
             this.isAuthenticated = true;
             this.isInProgress = false;
+            this.api = response.api;
+            console.log("done login!!");
+            console.log(response);
             this.emit('change');
         }.bind(this)).catch(function(error: string) {
             this.isAuthenticated = false;

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import LoginStore, {ICredential, ILoginErrors} from "../stores/loginstore";
 import LoginActions from '../actions/loginactions';
+import AppStores from '../appstores';
 
 export class LoginProps {
     store: LoginStore
@@ -33,16 +34,16 @@ export default class Login extends React.Component<LoginProps, any> {
     render() {
         var store = this.props.store;
         return (<form ref="loginForm">
-                  <span ref="credentialError" dangerouslySetInnerHTML={{ __html: store.errors.credential }}></span>
+                  <span ref="credentialError">{store.errors.credential}</span>
                   <div>
                     <label>Username: </label>
                     <input type="email" required={true} ref="username" />
-                    <span ref="usernameError" dangerouslySetInnerHTML={{ __html: store.errors.username }}></span>
+                    <span ref="usernameError">{store.errors.username}</span>
                   </div>
                   <div>
                     <label>Password: </label>
                     <input type="password" required={true} ref="password" />
-                    <span ref="passwordError"  dangerouslySetInnerHTML={{ __html: store.errors.password }}></span>
+                    <span ref="passwordError">{store.errors.password}</span>
                   </div>
                   <div>
                     <input type="button" value="Login" ref="btnLogin" onClick={this.dologin.bind(this) } />

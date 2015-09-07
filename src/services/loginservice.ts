@@ -1,4 +1,6 @@
-let electronRequire: Function = (global as any).electronRequire || require;
+let electronRequire: Function = (global as any).electronRequire || function () {
+  
+};
 
 var login = electronRequire("facebook-chat-api");
 
