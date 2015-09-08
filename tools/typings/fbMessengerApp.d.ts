@@ -16,6 +16,8 @@
 
 /// <reference path="../../src/components/chat.tsx" />
 
+/// <reference path="../../src/components/layout.tsx" />
+
 /// <reference path="../../src/components/login.tsx" />
 
 /// <reference path="../../src/decorators/connectToStores.tsx" />
