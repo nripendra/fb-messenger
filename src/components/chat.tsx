@@ -4,6 +4,7 @@ import ChatActions from '../actions/chatactions';
 import {Hbox, Vbox} from './layout';
 import AppStores from '../appstores';
 import connectToStore from '../decorators/connectToStores';
+import FriendList from './friendlist';
 
 export class ChatProps {
     api: any;
@@ -19,26 +20,11 @@ export default class Chat extends React.Component<ChatProps, any> {
     }
 
     render() {
-        var state = {
-            'online': {
-                border: '1px solid gray',
-                borderLeft: '3px solid green'
-            },
-            'offline': {
-                border: '1px solid gray',
-                borderLeft: '3px solid gray'
-            }
-        };
-        var friendList = Object.keys(AppStores.chatStore.friendList || []).map(id => AppStores.chatStore.friendList[id]);
+        var friendList = AppStores.chatStore.friendList;
         return (<Hbox>
                   <Vbox>
-                  {friendList.map(function(friend) {
-                      return (<Hbox>
-                                <img src={friend.thumbSrc} style={state[friend.onlineState || 'offline']} />
-                                {friend.name}
-                          </Hbox>);
-                  }) }
-                      </Vbox>
+                  <FriendList friendList={friendList} />
+                  </Vbox>
                   <Vbox></Vbox>
             </Hbox>);
     }

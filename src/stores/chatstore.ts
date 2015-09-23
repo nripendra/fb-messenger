@@ -8,7 +8,7 @@ export default class ChatStore extends Store {
     currentUserId: string;
     currentChatThread: string;
     error: any;
-    friendList: Array<any>;
+    friendList: { [id: string] : any; };//Dictionary<string, any>;
     messages: { [chatThreadId: string]: Array<any> };//Dictionary<string, Array<any>>
 
     get actions() {
