@@ -7,5 +7,8 @@ export default {
     },
     setCurrentChatThread(chatThread: string): void {
         dispatcher.dispatch('setCurrentChatThread', chatThread);
+    },
+    friendSelected(friend: any): void {
+        dispatcher.dispatch('friendSelected', friend);
     }
 };

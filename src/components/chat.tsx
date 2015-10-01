@@ -21,11 +21,15 @@ export default class Chat extends React.Component<ChatProps, any> {
 
     render() {
         var friendList = AppStores.chatStore.friendList;
+        var currentFriend = AppStores.chatStore.currentFriend;
+
         return (<Hbox>
                   <Vbox>
-                  <FriendList friendList={friendList} />
+                  <FriendList friendList={friendList} currentFriend={currentFriend} />
                   </Vbox>
-                  <Vbox></Vbox>
+                  <Vbox>
+                  <textarea></textarea>
+                  </Vbox>
             </Hbox>);
     }
 }

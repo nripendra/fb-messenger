@@ -5,21 +5,30 @@ import * as React from 'react';
  * @ref: https://gist.github.com/Munawwar/7926618
  */
 export var Style: any = {
-  merge(target: any, ...source: any[]) {
-        var from:any;
-        var keys:Array<string>;
-        var to = Object(target);
+  merge(target: any) {
+      //@ref = https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+      if (target === undefined || target === null) {
+        throw new TypeError('Cannot convert first argument to object');
+      }
 
-        for (var s = 1; s < source.length; s++) {
-            from = source[s];
-            keys = Object.keys(Object(from));
-
-            for (var i = 0; i < keys.length; i++) {
-                to[keys[i]] = from[keys[i]];
-            }
+      var to = Object(target);
+      for (var i = 1; i < arguments.length; i++) {
+        var nextSource = arguments[i];
+        if (nextSource === undefined || nextSource === null) {
+          continue;
         }
+        nextSource = Object(nextSource);
 
-        return to;
+        var keysArray = Object.keys(nextSource);
+        for (var nextIndex = 0, len = keysArray.length; nextIndex < len; nextIndex++) {
+          var nextKey = keysArray[nextIndex];
+          var desc = Object.getOwnPropertyDescriptor(nextSource, nextKey);
+          if (desc !== undefined && desc.enumerable) {
+            to[nextKey] = nextSource[nextKey];
+          }
+        }
+      }
+      return to;
     },
     "hbox": {
         display: "flex",
@@ -116,7 +125,7 @@ export var Style: any = {
 
 export class Hbox extends React.Component<any, any> {
 	render() {
-		var style = Style.merge(Style.hbox, this.props.style || {});
+    var style = Style.merge({}, Style.hbox, this.props.style || {});
 		return (
 			<div style={ style } data-box-layout="hbox">
 			{ this.props.children }
@@ -127,7 +136,7 @@ export class Hbox extends React.Component<any, any> {
 
 export class Vbox extends React.Component<any, any> {
 	render() {
-		var style = Style.merge(Style.vbox, this.props.style || {});
+    var style = Style.merge({}, Style.vbox, this.props.style || {});
 		return (
 			<div style={ style } data-box-layout="vbox">
 			{ this.props.children }

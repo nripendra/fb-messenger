@@ -10,11 +10,13 @@ export default class ChatStore extends Store {
     error: any;
     friendList: { [id: string] : any; };//Dictionary<string, any>;
     messages: { [chatThreadId: string]: Array<any> };//Dictionary<string, Array<any>>
-
+    currentFriend: any;
+    
     get actions() {
         return {
             'initApi': 'loadFriendList',
-            'setCurrentChatThread': 'setCurrentChatThread'
+            'setCurrentChatThread': 'setCurrentChatThread',
+            'friendSelected': 'friendSelected'
         };
     }
 
@@ -25,6 +27,7 @@ export default class ChatStore extends Store {
 
         this.chatService.getFriendList().then(function(data: Array<any>) {
             this.friendList = data;
+            this.currentFriend = this.friendList[Object.keys(this.friendList)[0]];
             console.log("Friendlist");
             console.log(this.friendList);
             this.emit('change');
@@ -33,6 +36,11 @@ export default class ChatStore extends Store {
             this.error = err;
             this.emit('change');
         }.bind(this));
+    }
+    
+    friendSelected(friend: any) {
+        this.currentFriend = friend;
+        this.emit('change');
     }
 
     setCurrentChatThread(chatThread: string) {
