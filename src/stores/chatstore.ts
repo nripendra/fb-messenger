@@ -12,6 +12,12 @@ export default class ChatStore extends Store {
     messages: { [chatThreadId: string]: Array<any> };//Dictionary<string, Array<any>>
     currentFriend: any;
     
+    constructor(){
+        super();
+        this.messages = {};
+        this.currentFriend = {id: ''};
+    }
+    
     get actions() {
         return {
             'initApi': 'loadFriendList',
@@ -26,7 +32,7 @@ export default class ChatStore extends Store {
         this.currentUserId = this.chatService.currentUserId;
 
         this.chatService.getFriendList().then(function(data: Array<any>) {
-            this.friendList = data;
+            this.friendList = data
             this.currentFriend = this.friendList[Object.keys(this.friendList)[0]];
             console.log("Friendlist");
             console.log(this.friendList);
@@ -53,18 +59,22 @@ export default class ChatStore extends Store {
 
         this.chatService.listener.on('error', function(error: any, stopListening: Function) {
             console.log(error);
-        });
+        }.bind(this));
 
         this.chatService.listener.on('message', function(event: any, stopListening: Function) {
-            console.log(event);
-        });
+            if(!this.messages[event.sender_id]){
+                this.messages[event.sender_id] = new Array<string>();
+            }
+            this.messages[event.sender_id].push(event);
+            this.emit('change');
+        }.bind(this));
 
         this.chatService.listener.on('event', function(event: any, stopListening: Function) {
             console.log(event);
-        });
+        }.bind(this));
 
         this.chatService.listener.on('presence', function(event: any, stopListening: Function) {
             console.log(event);
-        });
+        }.bind(this));
     }
 }

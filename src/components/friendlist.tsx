@@ -38,7 +38,10 @@ export default class FriendList extends React.Component<FriendListProps, any> {
         };
         
         var _this = this;
-        var friendList = Object.keys(this.props.friendList || []).map(id => this.props.friendList[id]);
+        var friendList = Object.keys(this.props.friendList || [])
+                               .map(id => this.props.friendList[id])
+                               .sort((x,y) => x.name.localeCompare(y.name))
+                               .filter(x => x.id != '');
         return (<div style={friendlistStyle}>
                   {friendList.map(function(friend: any) {
                       var currentFriend = (_this.props.currentFriend || {id: ''});

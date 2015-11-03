@@ -3,9 +3,11 @@ import App from '../../src/components/app';
 import Chat from '../../src/components/chat';
 
 import Login from '../../src/components/login';
+import FriendList from '../../src/components/friendlist';
 import AppStores from '../../src/appstores';
 import LoginActions from '../../src/actions/loginactions';
 import LoginService from '../../src/services/loginservice';
+import ChatStore from '../../src/stores/chatstore';
 
 import * as jsdom from 'jsdom';
 let React: any = null;
@@ -106,6 +108,30 @@ describe("fb-messenger", () => {
                     expect(AppStores.loginStore.errors.credential).toEqual("Invalid username/password");
                     done();
                 })
+            }, 10);
+        });
+    });
+    
+    describe("chat", ()=>
+    {
+        it("should show the message list of current friend",(done: Function) => {
+            AppStores.loginStore.api = {
+                setOptions: function(){},
+                getCurrentUserId: function(){return "0"},
+                getFriendsList: function(currentUserId:any, cb:Function){
+                    cb(null, {'1': {id: '1', name:'Friend1'}});
+                },
+            };
+            
+            AppStores.chatStore.currentFriend = {id: '1'};
+            AppStores.chatStore.messages['1'] = [{'messageID':'1','body': 'hello'}];
+            var chatUI = React.render(<Chat store={AppStores.chatStore} api={AppStores.loginStore.api} />, document.body);
+            expect(ReactTestUtils.scryRenderedComponentsWithType(chatUI, FriendList).length).toBe(1);
+            setTimeout(function() {
+                var callouts = ReactTestUtils.scryRenderedDOMComponentsWithClass(chatUI, "callout-in");
+                expect(callouts[0].getDOMNode().innerHTML).toBe('hello');
+                expect(callouts.length).toBe(1);
+                done();
             }, 10);
         });
     });
