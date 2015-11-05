@@ -19,7 +19,7 @@
     "browserify": "^11.0.1",
     "del": "^1.2.1",
     "delorean": "^0.9.4",
-    "facebook-chat-api": "^0.2.11",
+    "facebook-chat-api": "^1.0.3",
     "glob": "^5.0.14",
     "gulp": "^3.9.0",
     "gulp-atom": "^0.1.0",
