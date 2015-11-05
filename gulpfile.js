@@ -52,6 +52,7 @@ gulp.task('clean-ts', function (cb) {
 
     // delete the files
     del(typeScriptGenFiles, cb);
+    cb();
 });
 
 /**
