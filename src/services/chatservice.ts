@@ -17,13 +17,13 @@ export default class ChatService {
     }
 
     get currentUserId(): string {
-        return this.api.getCurrentUserId();
+        return this.api.getCurrentUserID();
     }
 
     getFriendList(): Promise<Array<any>> {
         var api = this.api;
         return new Promise(function(resolve: Function, reject: Function) {
-            api.getFriendsList(api.getCurrentUserId(), function(err: any, data: Array<any>) {
+            api.getFriendsList(api.getCurrentUserID(), function(err: any, data: Array<any>) {
                 if (err) {
                     reject(err);
                 } else {

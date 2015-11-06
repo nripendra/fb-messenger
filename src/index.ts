@@ -22,10 +22,8 @@
     app.on('ready', function () {
         app.commandLine.appendSwitch("js-flags", "--harmony");
         mainWindow = new BrowserWindow({
-            width: 300,
-            height: 360,
-            'min-width': 300,
-            'min-height': 360,
+            width: 450,
+            height: 450,
             frame: true
         });
         mainWindow.loadUrl('file://' + __dirname + '/index.html');

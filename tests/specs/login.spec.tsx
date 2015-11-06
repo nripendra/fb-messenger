@@ -26,7 +26,7 @@ describe("fb-messenger", () => {
             AppStores.loginStore.api =
             {
                 setOptions: () => { },
-                getCurrentUserId: () => { return "123" },
+                getCurrentUserID: () => { return "123" },
             };
             var myApp = React.render(<App />, document.body);
             expect(ReactTestUtils.scryRenderedComponentsWithType(myApp, Chat).length).toBe(1);
@@ -117,7 +117,7 @@ describe("fb-messenger", () => {
         it("should show the message list of current friend",(done: Function) => {
             AppStores.loginStore.api = {
                 setOptions: function(){},
-                getCurrentUserId: function(){return "0"},
+                getCurrentUserID: function(){return "0"},
                 getFriendsList: function(currentUserId:any, cb:Function){
                     cb(null, {'1': {id: '1', name:'Friend1'}});
                 },

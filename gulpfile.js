@@ -115,6 +115,11 @@ gulp.task('less', function () {
         .pipe(gulp.dest(config.compiled + '/styles'));
 });
 
+gulp.task('font-awesome', function () {
+    return gulp.src(config.source + 'styles/font-awesome/**/*.*')
+        .pipe(gulp.dest(config.compiled + '/styles/font-awesome'));
+});
+
 gulp.task('copy-static', ['compile-ts'], function () {
     gulp.src('./out/js/index.js')
         .pipe(babel({stage: 0}))
@@ -137,12 +142,13 @@ gulp.task('atom', ['browserify', 'copy-static'], function () {
     });
 });
 
-gulp.task('atom-run', ['atom'], function () {
+gulp.task('atom-run', ['atom'], function (cb) {
     var child = spawn('./electron/build/v0.26.1/win32-ia32/electron.exe', []);
+    cb();
 });
 
 gulp.task('watch', function () {
-    gulp.watch([config.allTypeScript], ['less', 'browserify', 'atom']);
+    gulp.watch([config.allTypeScript], ['less', 'font-awesome', 'browserify', 'atom']);
 });
 
-gulp.task('default', ['less', 'browserify', 'atom', 'atom-run', 'watch']);
+gulp.task('default', ['less', 'font-awesome', 'browserify', 'atom', 'atom-run', 'watch']);
