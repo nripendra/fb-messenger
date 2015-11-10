@@ -35,9 +35,13 @@
     "vinyl-transform": "^1.0.0"
   },
   "dependencies": {
-    "material-ui": "^0.13.1",
     "delorean": "^0.9.4",
+    "facebook-chat-api": "^1.0.3",
+    "lodash": "^3.10.1",
+    "lodash.debounce": "^3.1.1",
+    "lodash.throttle": "^3.0.4",
+    "material-ui": "^0.13.1",
     "react": "^0.14.2",
-    "facebook-chat-api": "^1.0.3"
+    "react-tap-event-plugin": "^0.2.1"
   }
 }

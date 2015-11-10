@@ -95,10 +95,16 @@ gulp.task('append-runner', ['compile-ts'], function () {
         .pipe(gulp.dest(config.tsOutputPath))
 });
 
-gulp.task('browserify', ['append-runner'], function () {
+gulp.task('copy-jsx', function () {
+    return gulp.src(config.source + '**/*.jsx')
+        .pipe(babel({stage: 0}))
+        .pipe(gulp.dest(config.tsOutputPath))
+});
+
+gulp.task('browserify', ['copy-jsx','append-runner'], function () {
     var babelifyStep = babelify.configure({stage: 0});
 
-    var allFiles = glob.sync(config.tsOutputPath + "**/*.js", {ignore: config.tsOutputPath + 'index.js'});
+    var allFiles = glob.sync(config.tsOutputPath + "**/*.{js,jsx}", {ignore: config.tsOutputPath + 'index.js'});
     var bundler = new Browserify({
         entries: allFiles,
         transform: [ babelifyStep ]
@@ -148,7 +154,7 @@ gulp.task('atom-run', ['atom'], function (cb) {
 });
 
 gulp.task('watch', function () {
-    gulp.watch([config.allTypeScript], ['less', 'font-awesome', 'browserify', 'atom']);
+    gulp.watch([config.allTypeScript, config.source + '**/*.jsx'], ['less', 'font-awesome', 'browserify', 'atom']);
 });
 
 gulp.task('default', ['less', 'font-awesome', 'browserify', 'atom', 'atom-run', 'watch']);

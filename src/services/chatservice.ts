@@ -22,11 +22,14 @@ export default class ChatService {
 
     getFriendList(): Promise<Array<any>> {
         var api = this.api;
-        return new Promise(function(resolve: Function, reject: Function) {
-            api.getFriendsList(api.getCurrentUserID(), function(err: any, data: Array<any>) {
+        var currentUserId = this.api.getCurrentUserID();
+        var getFriendsList = new Promise(function(resolve: Function, reject: Function) {
+            api.getFriendsList(currentUserId, function(err: any, data: Array<any>) {
                 if (err) {
                     reject(err);
                 } else {
+                    data.unshift(currentUserId);
+                    
                     api.getUserInfo(data, function(err: any, ret: Array<any>) {
                         if (err) {
                             reject(err);
@@ -38,6 +41,35 @@ export default class ChatService {
 
             });
         });
+        
+        var getOnlineFriends = new Promise(function(resolve: Function, reject: Function) {
+            api.getOnlineUsers(function(err: any, data: Array<any>) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(data);
+                }
+
+            });
+        });
+        
+        return new Promise(function(resolve: Function, reject: Function) {
+            Promise.all([getFriendsList, getOnlineFriends]).then((zipped)=>{
+                var usermap = zipped[0];
+                var olUsers = zipped[1] as Array<any>;
+                olUsers.forEach(x => {
+                    if(usermap.hasOwnProperty(x.userID)){
+                         usermap[x.userID].presence = x;
+                         usermap[x.userID].presence.statuses = usermap[x.userID].presence.statuses || {status: 'active'};
+                    }
+                });
+                resolve(usermap);
+            }).catch(err =>{
+                console.log(err);
+                reject(err);
+            });
+        });
+        
 
     }
 
