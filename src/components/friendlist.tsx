@@ -98,7 +98,7 @@ export default class FriendList extends React.Component<FriendListProps, any> {
         
         var friendlistStyle = {
             'overflow':'auto',
-            'padding-top':0,
+            'paddingTop':0,
             'maxHeight':'calc(100vh - 63px)'
         };
         
