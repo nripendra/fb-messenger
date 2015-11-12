@@ -18,10 +18,26 @@ export class ConversationHistoryProps {
 }
 
 export default class ConversationHistory extends React.Component<ConversationHistoryProps, any> {
+    private shouldScrollBottom: boolean;
     constructor(props: ConversationHistoryProps){
         super();
         this.props = props;
+        this.shouldScrollBottom = false;
     }
+    
+    //@ref: http://blog.vjeux.com/2013/javascript/scroll-position-with-react.html
+    componentWillUpdate() {
+        var currentNode = ReactDom.findDOMNode(this) as any;
+        this.shouldScrollBottom = (currentNode.scrollTop + currentNode.clientHeight) >= currentNode.scrollHeight;
+    }
+     
+    componentDidUpdate() {
+        if (this.shouldScrollBottom) {
+            var node = ReactDom.findDOMNode(this);
+            node.scrollTop = node.scrollHeight
+        }
+    }
+    
     render() {
         var styles = {
             messageListScrollPane: {
