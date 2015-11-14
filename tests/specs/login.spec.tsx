@@ -178,13 +178,15 @@ describe("fb-messenger", () => {
     });
 
     beforeEach(function() {
+    
         (global as any).document = jsdom.jsdom('<!doctype html><html><body><div id="fb-messenger"></div></body></html>');
         (global as any).window = document.defaultView;
         (global as any).Element = (global as any).window.Element;
         (global as any).HTMLFormElement = (global as any).window.HTMLFormElement;
         (global as any).navigator = {
-            userAgent: 'node.js'
+            userAgent: 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36'
         };
+        console.log(document.defaultView.navigator.userAgent)
 
         React = require('react');
 
