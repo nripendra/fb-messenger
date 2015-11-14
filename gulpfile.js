@@ -148,12 +148,13 @@ gulp.task('copy-static', ['compile-ts'], function () {
         .pipe(gulp.dest(config.compiled));
 });
 
+var electronVersion = 'v0.34.3';
 gulp.task('atom', ['browserify', 'copy-static'], function () {
     return atom({
         srcPath: './out/compile',
         releasePath: './electron/build',
         cachePath: './electron/cache',
-        version: 'v0.26.1',
+        version: electronVersion,
         rebuild: false,
         asar: true,
         platforms: ['win32-ia32']
@@ -161,7 +162,7 @@ gulp.task('atom', ['browserify', 'copy-static'], function () {
 });
 
 gulp.task('atom-run', ['atom'], function (cb) {
-    var child = spawn('./electron/build/v0.26.1/win32-ia32/electron.exe', []);
+    var child = spawn('./electron/build/' + electronVersion + '/win32-ia32/electron.exe', []);
     cb();
 });
 
