@@ -22,7 +22,19 @@ export class MessageContent extends React.Component<MessageContentProps, any> {
     }
 	
 	render() {
-		return (<div className={this.props.className} style={{'textAlign':'justify'}}>{this.props.message.body}</div>);
+		if(this.props.message.attachments.length == 0) {
+			return (<div className={this.props.className} style={{'textAlign':'justify'}}>{this.props.message.body}</div>);
+		} else {
+			return (<div>
+				{this.props.message.attachments.map((attachment:any) => {
+					if(attachment.type == "sticker") {
+						return (<img src={attachment.url} height={attachment.height} width={attachment.width} />);	
+					}
+					//empty div for now..
+					return <div />
+				})}
+			</div>);
+		}
 	}
 }
 
