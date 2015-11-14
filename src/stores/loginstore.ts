@@ -42,7 +42,6 @@ export default class LoginStore extends Store {
 
     setErrors(errors: ILoginErrors) {
         this.errors = errors;
-        console.log(this.errors);
         this.emit('change');
     }
 
@@ -57,7 +56,6 @@ export default class LoginStore extends Store {
             this.isInProgress = false;
             this.api = response.api;
             console.log("done login!!");
-            console.log(response);
             this.emit('change');
         }.bind(this)).catch(function(error: string) {
             console.log(error);

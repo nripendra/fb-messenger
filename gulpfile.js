@@ -12,6 +12,7 @@ var atom = require('gulp-atom'),
     insert = require('gulp-insert'),
     jasmine = require('gulp-jasmine'),
     less = require('gulp-less'),
+    runSequence = require('run-sequence'),
     source = require('vinyl-source-stream'),
     sourcemaps = require('gulp-sourcemaps'),
     spawn = require('child_process').spawn,
@@ -22,7 +23,13 @@ var atom = require('gulp-atom'),
 var config = new Config();
 var tsconfig = tsc.createProject('tsconfig.json', {typescript: typescript});
 
-gulp.task('compile-test', function(){
+gulp.task('copy-jsx-test', function () {
+    return gulp.src("./src/**/*.jsx")
+        .pipe(babel({stage: 0}))
+        .pipe(gulp.dest("./tests/out/src/"));
+});
+
+gulp.task('compile-test', ['copy-jsx-test'], function(){
   var sourceTsFiles = ["./tests/specs/**/*.{ts,tsx}",
   "./tools/typings/**/*.ts",
   "./src/**/*.{ts,tsx}",
@@ -155,6 +162,11 @@ gulp.task('atom-run', ['atom'], function (cb) {
 
 gulp.task('watch', function () {
     gulp.watch([config.allTypeScript, config.source + '**/*.jsx'], ['less', 'font-awesome', 'browserify', 'atom']);
+});
+
+gulp.task('build', function(cb) {
+    runSequence('test',
+              ['less', 'font-awesome', 'browserify', 'atom'], cb);
 });
 
 gulp.task('default', ['less', 'font-awesome', 'browserify', 'atom', 'atom-run', 'watch']);

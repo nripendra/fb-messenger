@@ -35,8 +35,6 @@ export default class ChatStore extends Store {
         this.chatService.getFriendList().then(function(data: Array<any>) {
             this.friendList = data
             this.currentFriend = this.friendList[Object.keys(this.friendList)[0]];
-            console.log("Friendlist");
-            console.log(this.friendList);
             this.emit('change');
             this.listen();
         }.bind(this)).catch(function(err: any) {
