@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/nripendra/fb-messenger.png?label=ready&title=Ready)](https://waffle.io/nripendra/fb-messenger)
 #Sample Project
 
 This project aims to use electron and reactjs to create a simple facebook messenger using facebook chat api.
