@@ -4,4 +4,4 @@ before_script:
 node_js:
   - "iojs"
 script:
-  - gulp browserify
+  - gulp build
