@@ -108,6 +108,10 @@ gulp.task('copy-jsx', function () {
         .pipe(gulp.dest(config.tsOutputPath))
 });
 
+gulp.on('err', function(e) {
+  console.log(e.err.stack);
+});
+
 gulp.task('browserify', ['copy-jsx','append-runner'], function () {
     var babelifyStep = babelify.configure({stage: 0});
 

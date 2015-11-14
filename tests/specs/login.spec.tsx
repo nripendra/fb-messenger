@@ -186,11 +186,10 @@ describe("fb-messenger", () => {
         (global as any).navigator = {
             userAgent: 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36'
         };
-        console.log(document.defaultView.navigator.userAgent)
 
         React = require('react');
 
-        ReactTestUtils = require('react-addons-test-utils');//React.addons.TestUtils;
+        ReactTestUtils = require('react-addons-test-utils');
         ReactDom = require('react-dom');
     });
 
