@@ -12,6 +12,7 @@ var atom = require('gulp-atom'),
     insert = require('gulp-insert'),
     jasmine = require('gulp-jasmine'),
     less = require('gulp-less'),
+    plumber = require('gulp-plumber'),
     runSequence = require('run-sequence'),
     source = require('vinyl-source-stream'),
     sourcemaps = require('gulp-sourcemaps'),
@@ -122,11 +123,13 @@ gulp.task('browserify', ['copy-jsx','append-runner'], function () {
     });
     return bundler
         .bundle()
-        .pipe(source('program.js'))
-        .pipe(gulp.dest(config.compiled))
-        .on('error', function (err) {
-            console.log(err);
-        });
+        .pipe(plumber({
+            handleError: function (err) {
+                console.log(err);
+                this.emit('end');
+            }
+        })).pipe(source('program.js'))
+        .pipe(gulp.dest(config.compiled));
 });
 
 gulp.task('less', function () {
