@@ -123,7 +123,10 @@ gulp.task('browserify', ['copy-jsx','append-runner'], function () {
     return bundler
         .bundle()
         .pipe(source('program.js'))
-        .pipe(gulp.dest(config.compiled));
+        .pipe(gulp.dest(config.compiled))
+        .on('error', function (err) {
+            console.log(err);
+        });
 });
 
 gulp.task('less', function () {
