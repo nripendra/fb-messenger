@@ -113,7 +113,7 @@ gulp.on('err', function(e) {
   console.log(e.err.stack);
 });
 
-gulp.task('browserify', ['copy-jsx','append-runner'], function () {
+gulp.task('browserify', ['copy-jsx'], function () {
     var babelifyStep = babelify.configure({stage: 0});
 
     var allFiles = glob.sync(config.tsOutputPath + "**/*.{js,jsx}", {ignore: config.tsOutputPath + 'index.js'});
