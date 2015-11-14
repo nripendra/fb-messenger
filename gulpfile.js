@@ -113,7 +113,7 @@ gulp.on('err', function(e) {
   console.log(e.err.stack);
 });
 
-gulp.task('browserify', ['copy-jsx','append-runner'], function () {
+gulp.task('browserify', ['copy-jsx','compile-ts'], function () {
     var babelifyStep = babelify.configure({stage: 0});
 
     var allFiles = glob.sync(config.tsOutputPath + "**/*.{js,jsx}", {ignore: config.tsOutputPath + 'index.js'});
@@ -123,12 +123,7 @@ gulp.task('browserify', ['copy-jsx','append-runner'], function () {
     });
     return bundler
         .bundle()
-        .pipe(plumber({
-            handleError: function (err) {
-                console.log(err);
-                this.emit('end');
-            }
-        })).pipe(source('program.js'))
+        .pipe(source('program.js'))
         .pipe(gulp.dest(config.compiled));
 });
 
