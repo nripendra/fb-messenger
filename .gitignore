@@ -31,6 +31,8 @@ electron
 
 out
 
+installer
+
 tests/out
 
 .idea

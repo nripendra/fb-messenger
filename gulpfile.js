@@ -9,6 +9,7 @@ var atom = require('gulp-atom'),
     glob = require('glob'),
     gulp = require('gulp'),
     inject = require('gulp-inject'),
+    inno = require('gulp-inno'),
     insert = require('gulp-insert'),
     jasmine = require('gulp-jasmine'),
     less = require('gulp-less'),
@@ -19,7 +20,8 @@ var atom = require('gulp-atom'),
     spawn = require('child_process').spawn,
     tsc = require('gulp-typescript'),
     transform = require('vinyl-transform'),
-    typescript = require('typescript');
+    typescript = require('typescript'),
+    zip = require('gulp-zip');
 
 var config = new Config();
 var tsconfig = tsc.createProject('tsconfig.json', {typescript: typescript});
@@ -149,7 +151,7 @@ gulp.task('copy-static', ['compile-ts'], function () {
 });
 
 var electronVersion = 'v0.34.3';
-gulp.task('atom', ['browserify', 'copy-static'], function () {
+gulp.task('atom-create', ['browserify', 'copy-static'], function () {
     return atom({
         srcPath: './out/compile',
         releasePath: './electron/build',
@@ -161,6 +163,22 @@ gulp.task('atom', ['browserify', 'copy-static'], function () {
     });
 });
 
+gulp.task('zip', function () {
+    return gulp.src(['./electron/build/' + electronVersion + '/win32-ia32/**/*.*','!./electron/build/' + electronVersion + '/win32-ia32/**/*.zip'])
+        .pipe(zip('fb-messenger.zip'))
+        .pipe(gulp.dest('./electron/build/' + electronVersion + '/win32-ia32/'));
+});
+
+gulp.task('atom', function (cb) {
+    return runSequence('atom-create','copy-node_modules', 'zip', cb);
+});
+
+gulp.task('copy-node_modules', function () {
+    return gulp.src('./node_modules/facebook-chat-api/**/*.*')
+        .pipe(gulp.dest('./electron/build/' + electronVersion + '/win32-ia32/resources/app/node_modules/facebook-chat-api'))
+});
+
+
 gulp.task('atom-run', ['atom'], function (cb) {
     var child = spawn('./electron/build/' + electronVersion + '/win32-ia32/electron.exe', []);
     cb();
@@ -170,9 +188,14 @@ gulp.task('watch', function () {
     gulp.watch([config.allTypeScript, config.source + '**/*.jsx'], ['less', 'font-awesome', 'browserify', 'atom']);
 });
 
+gulp.task('inno-setup', ['atom'], function(){
+    gulp.src('./installer_script.iss').pipe(inno());    
+});
+
+
 gulp.task('build', function(cb) {
-    runSequence('test',
-              ['less', 'font-awesome', 'browserify', 'atom'], cb);
+    return runSequence('test',
+              ['less', 'font-awesome', 'inno-setup'], cb);
 });
 
 gulp.task('default', ['less', 'font-awesome', 'browserify', 'atom', 'atom-run', 'watch']);
