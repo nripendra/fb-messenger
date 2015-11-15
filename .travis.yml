@@ -7,6 +7,6 @@ script:
   - gulp build
 addons:
   apt:
-    sources:
+    packages:
     - wine
     
