@@ -5,3 +5,8 @@ node_js:
   - "iojs"
 script:
   - gulp build
+addons:
+  apt:
+    sources:
+    - wine
+    
