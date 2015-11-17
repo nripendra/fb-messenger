@@ -6,6 +6,8 @@
 
 /// <reference path="../../src/index.ts" />
 
+/// <reference path="../../src/stdio-redirect.ts" />
+
 /// <reference path="../../src/program.tsx" />
 
 /// <reference path="../../src/actions/chatactions.ts" />

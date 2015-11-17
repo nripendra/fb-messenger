@@ -6,6 +6,7 @@ var atom = require('gulp-atom'),
     Browserify = require('browserify'),
     Config = require('./gulpfile.config'),
     del = require('del'),
+    electron = require('gulp-electron'),
     glob = require('glob'),
     gulp = require('gulp'),
     inject = require('gulp-inject'),
@@ -14,6 +15,8 @@ var atom = require('gulp-atom'),
     jasmine = require('gulp-jasmine'),
     less = require('gulp-less'),
     plumber = require('gulp-plumber'),
+    rename = require('gulp-rename'),
+    replace = require('gulp-batch-replace'),
     runSequence = require('run-sequence'),
     source = require('vinyl-source-stream'),
     sourcemaps = require('gulp-sourcemaps'),
@@ -25,6 +28,7 @@ var atom = require('gulp-atom'),
 
 var config = new Config();
 var tsconfig = tsc.createProject('tsconfig.json', {typescript: typescript});
+var packageJson = require('./package.json');
 
 gulp.task('copy-jsx-test', function () {
     return gulp.src("./src/**/*.jsx")
@@ -115,18 +119,27 @@ gulp.on('err', function(e) {
   console.log(e.err.stack);
 });
 
-gulp.task('browserify', ['copy-jsx','compile-ts'], function () {
+gulp.task('browserify-bundle', ['copy-jsx','compile-ts'], function (cb) {
     var babelifyStep = babelify.configure({stage: 0});
 
-    var allFiles = glob.sync(config.tsOutputPath + "**/*.{js,jsx}", {ignore: config.tsOutputPath + 'index.js'});
+    var allFiles = glob.sync(config.tsOutputPath + "**/*.{js,jsx}", {ignore: [config.tsOutputPath + 'index.js', config.tsOutputPath + 'stdio-redirect.js']});
     var bundler = new Browserify({
         entries: allFiles,
         transform: [ babelifyStep ]
     });
-    return bundler
+        return bundler
         .bundle()
         .pipe(source('program.js'))
         .pipe(gulp.dest(config.compiled));
+});
+
+gulp.task('browserify-copy_node_modules', function () {
+    return gulp.src('./node_modules/facebook-chat-api/**/*.*')
+        .pipe(gulp.dest('./out/compile/node_modules/facebook-chat-api'));
+});
+
+gulp.task('browserify', function (cb) {
+    return runSequence('browserify-bundle' ,'browserify-copy_node_modules', cb);
 });
 
 gulp.task('less', function () {
@@ -145,57 +158,106 @@ gulp.task('copy-static', ['compile-ts'], function () {
         .pipe(babel({stage: 0}))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(config.compiled));
+        
+   gulp.src('./out/js/stdio-redirect.js')
+        .pipe(babel({stage: 0}))
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest(config.compiled));
 
     return gulp.src(['./src/index.html', './package.json'])
         .pipe(gulp.dest(config.compiled));
 });
 
 var electronVersion = 'v0.34.3';
-gulp.task('atom-create', ['browserify', 'copy-static'], function () {
-    return atom({
-        srcPath: './out/compile',
-        releasePath: './electron/build',
-        cachePath: './electron/cache',
+
+gulp.task('atom-clean', function(cb){
+    return del('./electron/build/**/*.*', cb);
+});
+
+gulp.task('atom-create', ['atom-clean', 'browserify', 'copy-static'], function () {
+    return gulp.src("")
+    .pipe(electron({
+        src: './out/compile',
+        packageJson: packageJson,
+        release: './electron/build',
+        cache: './electron/cache',
         version: electronVersion,
-        rebuild: false,
+        packaging: false,
         asar: true,
-        platforms: ['win32-ia32']
-    });
+        platforms: ['win32-ia32'],//, 'darwin-x64'],
+        platformResources: {
+            // darwin: {
+            //     CFBundleDisplayName: packageJson.name,
+            //     CFBundleIdentifier: packageJson.name,
+            //     CFBundleName: packageJson.name,
+            //     CFBundleVersion: packageJson.version,
+            //     icon: 'fb-messenger.icns'
+            // },
+            win: {
+                "version-string": packageJson.version,
+                "file-version": packageJson.version,
+                "product-version": packageJson.version,
+                "icon": 'fb-messenger.ico'
+            }
+        }
+    }))
+    .pipe(gulp.dest(""));
+    // return atom({
+    //     srcPath: './out/compile',
+    //     releasePath: './electron/build',
+    //     cachePath: './electron/cache',
+    //     version: electronVersion,
+    //     rebuild: false,
+    //     asar: true,
+    //     platforms: ['win32-ia32']
+    // });
 });
 
-gulp.task('zip', function () {
-    return gulp.src(['./electron/build/' + electronVersion + '/win32-ia32/**/*.*','!./electron/build/' + electronVersion + '/win32-ia32/**/*.zip'])
-        .pipe(zip('fb-messenger.zip'))
-        .pipe(gulp.dest('./electron/build/' + electronVersion + '/win32-ia32/'));
+gulp.task('atom', ['less', 'font-awesome'], function (cb) {
+    return runSequence('atom-clean','atom-create', cb);
 });
-
-gulp.task('atom', function (cb) {
-    return runSequence('atom-create','copy-node_modules', 'zip', cb);
-});
-
-gulp.task('copy-node_modules', function () {
-    return gulp.src('./node_modules/facebook-chat-api/**/*.*')
-        .pipe(gulp.dest('./electron/build/' + electronVersion + '/win32-ia32/resources/app/node_modules/facebook-chat-api'))
-});
-
 
 gulp.task('atom-run', ['atom'], function (cb) {
-    var child = spawn('./electron/build/' + electronVersion + '/win32-ia32/electron.exe', []);
+    var child = spawn('./electron/build/' + electronVersion + '/win32-ia32/fb-messenger.exe', []);
     cb();
 });
 
 gulp.task('watch', function () {
-    gulp.watch([config.allTypeScript, config.source + '**/*.jsx'], ['less', 'font-awesome', 'browserify', 'atom']);
+    gulp.watch([config.allTypeScript, config.source + '**/*.jsx'], ['atom']);
 });
 
-gulp.task('inno-setup', ['atom'], function(){
-    gulp.src('./installer_script.iss').pipe(inno());    
+gulp.task('inno-script-transform',  function(){
+    return gulp.src('./installer_script.iss').pipe(replace([
+        ["{{appname}}", packageJson.name], 
+        ["{{appver}}", packageJson.version],
+        ["{{outputfilename}}", packageJson.name + "-setup"],
+        ["{{OutputDir}}", "./installer"],
+        ["{{PackageFiles}}", "./electron/build/" + electronVersion + "/win32-ia32/*.*"]
+        ]))
+    .pipe(rename("installer_script.temp.iss"))
+    .pipe(gulp.dest('./'));
 });
 
+gulp.task('inno-script-exec', function(){
+    return gulp.src('./installer_script.temp.iss')
+               .pipe(inno());
+});
 
 gulp.task('build', function(cb) {
-    return runSequence('test',
-              ['less', 'font-awesome', 'inno-setup'], cb);
+    return runSequence('test', 'atom', cb);
 });
 
-gulp.task('default', ['less', 'font-awesome', 'browserify', 'atom', 'atom-run', 'watch']);
+gulp.task('package-win32', ['build'], function(cb){
+     return runSequence('inno-script-transform', 'inno-script-exec', function(){
+         console.log("deleting temporary installer_script...");
+         del('./installer_script.temp.iss');
+         
+         if(cb) cb();
+     });
+});
+
+gulp.task('run',  function(cb) {
+    return runSequence('atom-run', 'watch', cb);
+});
+
+gulp.task('default', ['build']);

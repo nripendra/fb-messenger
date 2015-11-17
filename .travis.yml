@@ -9,4 +9,13 @@ addons:
   apt:
     packages:
     - wine
+before_deploy:
+  - gulp package-win32
+deploy:
+  provider: releases
+  api_key: $GH_KEY
+  file: ./installer/fb-messenger-setup.exe
+  skip_cleanup: true
+  on:
+    tags: true
     

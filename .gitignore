@@ -36,3 +36,6 @@ installer
 tests/out
 
 .idea
+
+# Just in case...
+installer_script.temp.iss
