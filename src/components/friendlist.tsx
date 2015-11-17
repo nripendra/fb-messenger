@@ -137,10 +137,12 @@ export default class FriendList extends React.Component<FriendListProps, any> {
                                        return diff;
                                })
                                .filter(x => x.isFriend === true);
-        return (<div style={{'height':'calc(100vh - 8px)', 'maxHeight':'calc(100vh - 8px)'}}>
+        let leftPane =  {'height':'calc(100vh - 8px)', 'maxHeight':'calc(100vh - 8px)'};
+        let searchTextField =  {width:'180px'};
+        return (<div style={leftPane}>
                  <Toolbar>
                     <ToolbarGroup key={0} float="left">
-                        <TextField hintText="Search..." style={{width:'180px'}} />
+                        <TextField hintText="Search..." style={searchTextField} />
                     </ToolbarGroup>
                     <ToolbarGroup key={1} float="right">
                         <ToolbarSeparator/>

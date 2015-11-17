@@ -22,8 +22,9 @@ export class MessageContent extends React.Component<MessageContentProps, any> {
     }
 	
 	render() {
-		if(this.props.message.attachments.length == 0) {
-			return (<div className={this.props.className} style={{'textAlign':'justify'}}>{this.props.message.body}</div>);
+		if((this.props.message.attachments || []).length == 0) {
+			let justify = {'textAlign':'justify'};
+			return (<div className={this.props.className} style={justify}>{this.props.message.body}</div>);
 		} else {
 			return (<div>
 				{this.props.message.attachments.map((attachment:any) => {

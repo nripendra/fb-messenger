@@ -12,6 +12,8 @@ var atom = require('gulp-atom'),
     insert = require('gulp-insert'),
     jasmine = require('gulp-jasmine'),
     less = require('gulp-less'),
+    plumber = require('gulp-plumber'),
+    runSequence = require('run-sequence'),
     source = require('vinyl-source-stream'),
     sourcemaps = require('gulp-sourcemaps'),
     spawn = require('child_process').spawn,
@@ -22,7 +24,13 @@ var atom = require('gulp-atom'),
 var config = new Config();
 var tsconfig = tsc.createProject('tsconfig.json', {typescript: typescript});
 
-gulp.task('compile-test', function(){
+gulp.task('copy-jsx-test', function () {
+    return gulp.src("./src/**/*.jsx")
+        .pipe(babel({stage: 0}))
+        .pipe(gulp.dest("./tests/out/src/"));
+});
+
+gulp.task('compile-test', ['copy-jsx-test'], function(){
   var sourceTsFiles = ["./tests/specs/**/*.{ts,tsx}",
   "./tools/typings/**/*.ts",
   "./src/**/*.{ts,tsx}",
@@ -101,7 +109,11 @@ gulp.task('copy-jsx', function () {
         .pipe(gulp.dest(config.tsOutputPath))
 });
 
-gulp.task('browserify', ['copy-jsx','append-runner'], function () {
+gulp.on('err', function(e) {
+  console.log(e.err.stack);
+});
+
+gulp.task('browserify', ['copy-jsx','compile-ts'], function () {
     var babelifyStep = babelify.configure({stage: 0});
 
     var allFiles = glob.sync(config.tsOutputPath + "**/*.{js,jsx}", {ignore: config.tsOutputPath + 'index.js'});
@@ -136,12 +148,13 @@ gulp.task('copy-static', ['compile-ts'], function () {
         .pipe(gulp.dest(config.compiled));
 });
 
+var electronVersion = 'v0.34.3';
 gulp.task('atom', ['browserify', 'copy-static'], function () {
     return atom({
         srcPath: './out/compile',
         releasePath: './electron/build',
         cachePath: './electron/cache',
-        version: 'v0.26.1',
+        version: electronVersion,
         rebuild: false,
         asar: true,
         platforms: ['win32-ia32']
@@ -149,12 +162,17 @@ gulp.task('atom', ['browserify', 'copy-static'], function () {
 });
 
 gulp.task('atom-run', ['atom'], function (cb) {
-    var child = spawn('./electron/build/v0.26.1/win32-ia32/electron.exe', []);
+    var child = spawn('./electron/build/' + electronVersion + '/win32-ia32/electron.exe', []);
     cb();
 });
 
 gulp.task('watch', function () {
     gulp.watch([config.allTypeScript, config.source + '**/*.jsx'], ['less', 'font-awesome', 'browserify', 'atom']);
+});
+
+gulp.task('build', function(cb) {
+    runSequence('test',
+              ['less', 'font-awesome', 'browserify', 'atom'], cb);
 });
 
 gulp.task('default', ['less', 'font-awesome', 'browserify', 'atom', 'atom-run', 'watch']);

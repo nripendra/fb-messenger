@@ -4,6 +4,7 @@ import Chat from '../../src/components/chat';
 
 import Login from '../../src/components/login';
 import FriendList from '../../src/components/friendlist';
+import MessageItem from '../../src/components/message-item';
 import AppStores from '../../src/appstores';
 import LoginActions from '../../src/actions/loginactions';
 import LoginService from '../../src/services/loginservice';
@@ -12,12 +13,12 @@ import ChatStore from '../../src/stores/chatstore';
 import * as jsdom from 'jsdom';
 let React: any = null;
 let ReactTestUtils: any = null;
-console.log("describing Login");
+let ReactDom: any = null;
 describe("fb-messenger", () => {
     describe("app", () => {
         it("should show login form", () => {
             AppStores.loginStore.isAuthenticated = false;
-            var myApp = React.render(<App />, document.body);
+            var myApp = ReactDom.render(<App />, document.getElementById('fb-messenger'));
             expect(ReactTestUtils.scryRenderedComponentsWithType(myApp, Login).length).toBe(1);
         });
 
@@ -27,16 +28,24 @@ describe("fb-messenger", () => {
             {
                 setOptions: () => { },
                 getCurrentUserID: () => { return "123" },
+                getFriendsList: function(currentUserId:any, cb:Function){
+                    cb(null, [{'1': {id: '1', name:'Friend1'}}]);
+                },
+                getUserInfo: function(data:any, cb:Function){
+                    cb({
+                        '1':{id:'1', name:'friend1', thumbSrc:'http://www.marismith.com/wp-content/uploads/2014/07/facebook-profile-blank-face.jpeg'}
+                    });
+                },
             };
-            var myApp = React.render(<App />, document.body);
+            var myApp = ReactDom.render(<App />, document.getElementById('fb-messenger'));
             expect(ReactTestUtils.scryRenderedComponentsWithType(myApp, Chat).length).toBe(1);
         });
     });
 
     describe("login", () => {
         it("should show login from controls", () => {
-            var loginForm = React.render(<Login store={AppStores.loginStore} />, document.body);
-            expect(ReactTestUtils.scryRenderedDOMComponentsWithTag(loginForm, "input").length).toBe(3);
+            var loginForm = ReactDom.render(<Login store={AppStores.loginStore} />, document.getElementById('fb-messenger'));
+            expect(ReactTestUtils.scryRenderedDOMComponentsWithTag(loginForm, "input").length).toBe(2);
         });
 
         it("should show validation errors when there are values in errors property of loginStore", () => {
@@ -47,10 +56,10 @@ describe("fb-messenger", () => {
                 credential: ""
             });
 
-            var loginForm = React.render(<Login store={AppStores.loginStore} />, document.body);
-            expect(React.findDOMNode(loginForm.refs["usernameError"]).innerHTML).toEqual("Username cannot be empty");
-            expect(React.findDOMNode(loginForm.refs["passwordError"]).innerHTML).toEqual("password cannot be empty");
-            expect(React.findDOMNode(loginForm.refs["credentialError"]).innerHTML.length).toBe(0);
+            var loginForm = ReactDom.render(<Login store={AppStores.loginStore} />, document.getElementById('fb-messenger'));
+            expect(loginForm.refs["username"].state.errorText).toEqual("Username cannot be empty");
+            expect(loginForm.refs["password"].state.errorText).toEqual("password cannot be empty");
+            expect(ReactDom.findDOMNode(loginForm.refs["credentialError"]).innerHTML.length).toBe(0);
         });
 
         it("should call authenticate when login button is clicked, and form is valid", () => {
@@ -59,8 +68,9 @@ describe("fb-messenger", () => {
             HTMLFormElement.prototype.checkValidity = () => true;
 
             spyOn(LoginActions, 'authenticate');
-            var loginForm = React.render(<Login store={AppStores.loginStore} />, document.body);
-            ReactTestUtils.Simulate.click(React.findDOMNode(loginForm.refs["btnLogin"]));
+            var loginForm = ReactDom.render(<Login store={AppStores.loginStore} />, document.getElementById('fb-messenger'));
+            //console.log(ReactDom.findDOMNode(loginForm.refs["btnLogin"]));
+            ReactTestUtils.Simulate.click(ReactDom.findDOMNode(loginForm.refs["btnLogin"]).firstChild);
             expect(LoginActions.authenticate).toHaveBeenCalled();
         });
 
@@ -71,9 +81,9 @@ describe("fb-messenger", () => {
 
             spyOn(LoginActions, 'setErrors');
 
-            var loginForm = React.render(<Login store={AppStores.loginStore} />, document.body);
+            var loginForm = ReactDom.render(<Login store={AppStores.loginStore} />, document.getElementById('fb-messenger'));
 
-            ReactTestUtils.Simulate.click(React.findDOMNode(loginForm.refs["btnLogin"]));
+            ReactTestUtils.Simulate.click(ReactDom.findDOMNode(loginForm.refs["btnLogin"]).firstChild);
 
             expect(LoginActions.setErrors).toHaveBeenCalled();
         });
@@ -84,9 +94,9 @@ describe("fb-messenger", () => {
             //We don't actually want to hit facebook in our unit test
             spyOn(LoginService.prototype, 'authenticate').and.returnValue(Promise.resolve({}));
 
-            var loginForm = React.render(<Login store={AppStores.loginStore} />, document.body);
+            var loginForm = ReactDom.render(<Login store={AppStores.loginStore} />, document.getElementById('fb-messenger'));
 
-            ReactTestUtils.Simulate.click(React.findDOMNode(loginForm.refs["btnLogin"]));
+            ReactTestUtils.Simulate.click(ReactDom.findDOMNode(loginForm.refs["btnLogin"]).firstChild);
 
             expect(LoginService.prototype.authenticate).toHaveBeenCalled();
         });
@@ -97,9 +107,9 @@ describe("fb-messenger", () => {
             var rejected = Promise.reject({});
             spyOn(LoginService.prototype, 'authenticate').and.returnValue(rejected);
 
-            var loginForm = React.render(<Login store={AppStores.loginStore} />, document.body);
+            var loginForm = ReactDom.render(<Login store={AppStores.loginStore} />, document.getElementById('fb-messenger'));
 
-            ReactTestUtils.Simulate.click(React.findDOMNode(loginForm.refs["btnLogin"]));
+            ReactTestUtils.Simulate.click(ReactDom.findDOMNode(loginForm.refs["btnLogin"]).firstChild);
 
             expect(LoginService.prototype.authenticate).toHaveBeenCalled();
 
@@ -119,41 +129,75 @@ describe("fb-messenger", () => {
                 setOptions: function(){},
                 getCurrentUserID: function(){return "0"},
                 getFriendsList: function(currentUserId:any, cb:Function){
-                    cb(null, {'1': {id: '1', name:'Friend1'}});
+                    cb(null, [{'1': {id: '1', name:'Friend1'}}]);
+                },
+                getUserInfo: function(data:any, cb:Function){
+                    cb({
+                        '1':{id:'1', name:'friend1', thumbSrc:'http://www.marismith.com/wp-content/uploads/2014/07/facebook-profile-blank-face.jpeg'}
+                    });
                 },
             };
             
             AppStores.chatStore.currentFriend = {id: '1'};
-            AppStores.chatStore.messages['1'] = [{'messageID':'1','body': 'hello'}];
-            var chatUI = React.render(<Chat store={AppStores.chatStore} api={AppStores.loginStore.api} />, document.body);
+            AppStores.chatStore.messages['1'] = [{'messageID':'1','body': 'hello', attachments: []}];
+            var chatUI = ReactDom.render(<Chat store={AppStores.chatStore} api={AppStores.loginStore.api} />, document.getElementById('fb-messenger'));
             expect(ReactTestUtils.scryRenderedComponentsWithType(chatUI, FriendList).length).toBe(1);
             setTimeout(function() {
-                var callouts = ReactTestUtils.scryRenderedDOMComponentsWithClass(chatUI, "callout-in");
-                expect(callouts[0].getDOMNode().innerHTML).toBe('hello');
+                var callouts = ReactTestUtils.scryRenderedDOMComponentsWithClass(chatUI, "callout");
+                expect(ReactDom.findDOMNode(callouts[0]).innerHTML).toBe('hello');
                 expect(callouts.length).toBe(1);
                 done();
             }, 10);
         });
     });
+    
+    describe("message-item", ()=>
+    {
+        it("should show the message body if there is no attachments",() => {
+            var message = {'senderID': '1' ,'messageID':'1','body': 'hello'};
+            var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{id: '1'}} currentUser={{id: '10'}} />, document.getElementById('fb-messenger'));
+            var callouts = ReactTestUtils.scryRenderedDOMComponentsWithClass(messageItem, "callout");
+            expect(ReactDom.findDOMNode(callouts[0]).innerHTML).toBe('hello');
+        });
+        
+        it("should show the message body if attachments is empty",() => {
+            var attachments = new Array<any>();
+            var message = {'senderID': '1' ,'messageID':'1','body': 'hello', attachments: attachments};
+            var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{id: '1'}} currentUser={{id: '10'}} />, document.getElementById('fb-messenger'));
+            var callouts = ReactTestUtils.scryRenderedDOMComponentsWithClass(messageItem, "callout");
+            expect(ReactDom.findDOMNode(callouts[0]).innerHTML).toBe('hello');
+        });
+        
+        it("should show the message sticker if there is one",() => {
+            var attachments = new Array<any>({type:"sticker",url: "http://sticker.com/sticker.jpg"});
+            var message = {'senderID': '1' ,'messageID':'1','body': '', attachments: attachments};
+            var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{id: '1'}} currentUser={{id: '10'}} />, document.getElementById('fb-messenger'));
+            var sticker = ReactTestUtils.scryRenderedDOMComponentsWithTag(messageItem, "img");
+            expect(sticker.length).toBe(1);
+        });
+    });
 
     beforeEach(function() {
-        (global as any).document = jsdom.jsdom('<!doctype html><html><body></body></html>');
+    
+        (global as any).document = jsdom.jsdom('<!doctype html><html><body><div id="fb-messenger"></div></body></html>');
         (global as any).window = document.defaultView;
         (global as any).Element = (global as any).window.Element;
         (global as any).HTMLFormElement = (global as any).window.HTMLFormElement;
         (global as any).navigator = {
-            userAgent: 'node.js'
+            userAgent: 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36'
         };
 
-        React = require('react/addons');
+        React = require('react');
 
-        ReactTestUtils = React.addons.TestUtils;
+        ReactTestUtils = require('react-addons-test-utils');
+        ReactDom = require('react-dom');
     });
 
     afterEach(function(done) {
-        React.unmountComponentAtNode(document.body)
+        ReactDom.unmountComponentAtNode(document.getElementById('fb-messenger'))
         React = null;
         ReactTestUtils = null;
+        ReactDom = null;
         (global as any).document.body.innerHTML = "";
         (global as any).document = null;
         (global as any).window = null;

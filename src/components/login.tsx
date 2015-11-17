@@ -51,8 +51,9 @@ export default class Login extends React.Component<LoginProps, any> {
         var loginButton = {marginLeft: 77};
         var error = {marginLeft: 5, color: '#cc0000'};
         var cardStyle = {'display':'block','margin':'2px auto', 'width':'calc(100vw - 5px)', 'height':'calc(100vh - 5px)'};
+        var centerAlignCard = {margin:'0 auto', width:'300px'};
         return (<Card style={cardStyle} initiallyExpanded={true}>
-                    <div style={{margin:'0 auto', width:'300px'}}>
+                    <div style={centerAlignCard}>
                     <CardHeader
                         title="Facebook"
                         titleStyle={{'fontSize':'1.5em'}}

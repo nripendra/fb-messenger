@@ -16,7 +16,6 @@ const Paper = require('material-ui/lib/paper');
 const AutoPrefix = require('material-ui/lib/styles/auto-prefix');
 const ContextPure = require('material-ui/lib/mixins/context-pure');
 
-const ReactTransitionGroup = require('react-addons-transition-group');
 const ClickAwayable = require('material-ui/lib/mixins/click-awayable');
 const StylePropable = require('material-ui/lib/mixins/style-propable');
 const Events = require ('material-ui/lib/utils/events');
