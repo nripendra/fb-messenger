@@ -31,7 +31,12 @@ electron
 
 out
 
+installer
+
 tests/out
 
 .idea
-installer/fb-messenger-setup.exe
+
+# Just in case...
+installer_script.temp.iss
+

@@ -13,6 +13,7 @@
 	<body>
 		<div id="fb-messenger"></div>
 		<script type="text/javascript">
+			electronRequire('./stdio-redirect')		
 			window.addEventListener('DOMContentLoaded', function(){
 				Program.main();
 			});
