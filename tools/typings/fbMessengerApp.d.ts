@@ -22,6 +22,8 @@
 
 /// <reference path="../../src/components/conversation.tsx" />
 
+/// <reference path="../../src/components/emojify.tsx" />
+
 /// <reference path="../../src/components/friendlist.tsx" />
 
 /// <reference path="../../src/components/layout.tsx" />

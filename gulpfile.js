@@ -153,6 +153,13 @@ gulp.task('font-awesome', function () {
         .pipe(gulp.dest(config.compiled + '/styles/font-awesome'));
 });
 
+gulp.task('min-emoji', function () {
+    return gulp.src(config.source + 'styles/min-emoji/**/*.*')
+        .pipe(gulp.dest(config.compiled + '/styles/min-emoji'));
+});
+
+gulp.task('3rd-party-assets', ['font-awesome', 'min-emoji']);
+
 gulp.task('copy-static', ['compile-ts'], function () {
     gulp.src('./out/js/index.js')
         .pipe(babel({stage: 0}))
@@ -170,7 +177,12 @@ gulp.task('copy-static', ['compile-ts'], function () {
 
 var electronVersion = 'v0.34.3';
 
-gulp.task('atom-clean', function(cb){
+gulp.task('atom-kill', function (cb) {
+    spawn('taskkill', ["/im", "fb-messenger.exe", "/f", "/t"]);
+    cb();
+});
+
+gulp.task('atom-clean', ['atom-kill'], function(cb){
     return del('./electron/build/**/*.*', cb);
 });
 
@@ -213,7 +225,7 @@ gulp.task('atom-create', ['atom-clean', 'browserify', 'copy-static'], function (
     // });
 });
 
-gulp.task('atom', ['less', 'font-awesome'], function (cb) {
+gulp.task('atom', ['less', '3rd-party-assets'], function (cb) {
     return runSequence('atom-clean','atom-create', cb);
 });
 
@@ -223,7 +235,7 @@ gulp.task('atom-run', ['atom'], function (cb) {
 });
 
 gulp.task('watch', function () {
-    gulp.watch([config.allTypeScript, config.source + '**/*.jsx'], ['atom']);
+    gulp.watch([config.allTypeScript, config.source + '**/*.jsx'], ['run']);
 });
 
 gulp.task('inno-script-transform',  function(){
