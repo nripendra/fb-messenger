@@ -178,7 +178,11 @@ gulp.task('copy-static', ['compile-ts'], function () {
 var electronVersion = 'v0.34.3';
 
 gulp.task('atom-kill', function (cb) {
-    spawn('taskkill', ["/im", "fb-messenger.exe", "/f", "/t"]);
+    if(process.platform == 'win32'){
+        spawn('taskkill', ["/im", "fb-messenger.exe", "/f", "/t"]);
+    } else {
+        spawn('killall', ['-I', '-w', 'fb-messenger.exe']);
+    }
     cb();
 });
 
