@@ -260,11 +260,11 @@ gulp.task('inno-script-exec', function(){
 });
 
 gulp.task('build', function(cb) {
-    return runSequence('test', 'atom', cb);
+    return runSequence('test','browserify', 'copy-static', 'less', '3rd-party-assets', cb);
 });
 
 gulp.task('package-win32', ['build'], function(cb){
-     return runSequence('inno-script-transform', 'inno-script-exec', function(){
+     return runSequence('atom', 'inno-script-transform', 'inno-script-exec', function(){
          console.log("deleting temporary installer_script...");
          del('./installer_script.temp.iss');
          
