@@ -160,7 +160,7 @@ gulp.task('min-emoji', function () {
 
 gulp.task('3rd-party-assets', ['font-awesome', 'min-emoji']);
 
-gulp.task('copy-static', ['compile-ts'], function () {
+gulp.task('copy-static', function () {
     gulp.src('./out/js/index.js')
         .pipe(babel({stage: 0}))
         .pipe(sourcemaps.write('.'))
