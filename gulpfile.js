@@ -134,8 +134,8 @@ gulp.task('browserify-bundle', ['copy-jsx','compile-ts'], function (cb) {
 });
 
 gulp.task('browserify-copy_node_modules', function () {
-    return gulp.src('./node_modules/facebook-chat-api/**/*.*')
-        .pipe(gulp.dest('./out/compile/node_modules/facebook-chat-api'));
+    return gulp.src(['./node_modules/facebook-chat-api/**/*'], { "base" : "." })
+        .pipe(gulp.dest('./out/compile/'));
 });
 
 gulp.task('browserify', function (cb) {

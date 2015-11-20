@@ -34,6 +34,8 @@
 
 /// <reference path="../../src/decorators/connectToStores.tsx" />
 
+/// <reference path="../../src/services/auto-update.ts" />
+
 /// <reference path="../../src/services/chatservice.ts" />
 
 /// <reference path="../../src/services/loginservice.ts" />
