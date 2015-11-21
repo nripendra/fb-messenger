@@ -1,8 +1,6 @@
 import * as semver from "semver";
 import AutoUpdaterActions from "../actions/auto-updateractions";
 
-let electronRequire: Function = (global as any).electronRequire || function () {return;};
-
 export class Time {
 	public static _5Minutes:number = 5 * 60 * 1000;
 	public static _10Minutes:number = 10 * 60 * 1000;
@@ -14,13 +12,14 @@ export default class AutoUpdateService {
 	private checkForUpdateSchedule: Array<number>;
 	private URL:string = "https://api.github.com/repos/nripendra/fb-messenger/releases";
 	// "https://api.github.com/repos/TryGhost/Ghost/releases";
-
+	public electronRequire:Function;// for supporting DI, not sure how else to do it. 
 	constructor() {
 		this.checkForUpdateSchedule = new Array<number>();
+		this.electronRequire = (global as any).electronRequire || function () {return;};
 	}
 
 	checkForUpdate() {
-		let app = electronRequire("remote").require("app");
+		let app = this.electronRequire("remote").require("app");
 		let version = app.getVersion();
 		let request = new XMLHttpRequest();
 		let allowPrerelease = true;// get from settings.
@@ -35,7 +34,6 @@ export default class AutoUpdateService {
 				let releases = JSON.parse(request.responseText) || [];
 				let latestRelease = (releases.length > 0) ? releases[0] : {tag_name: "0.0.0", prelease: true, assets:[]};
 				let eligible = semver.gt(latestRelease.tag_name, version);
-
 				eligible = eligible && (allowPrerelease || (latestRelease.prelease === false));
 				eligible = eligible && ((latestRelease.assets || []).length > 0);
 				var assetFound:boolean = false;
@@ -91,7 +89,8 @@ export default class AutoUpdateService {
 
 	checkPlatform(asset:any){
 		// will support platform and processor architecture somewhere in future... 
-		return asset.name.match(process.platform) && asset.name.match(process.arch);
+		//return asset.name.match(process.platform) && asset.name.match(process.arch);
+		return true;
 	}
 
 	recheckAfter(milliseconds: number) {
@@ -111,13 +110,13 @@ export default class AutoUpdateService {
 
 	launchInstaller(pathOfInstaller: string) {
 		console.log("launching " + pathOfInstaller + "...");
-		let exec = electronRequire("child_process").exec;
+		let exec = this.electronRequire("child_process").exec;
 		exec(pathOfInstaller);
 	}
 
 	launchScheduledInstallerTask(asset: any) {
 		console.log("Launching installer...");
-		let exec = electronRequire("child_process").exec;
+		let exec = this.electronRequire("child_process").exec;
 		// @important!! this value depends upon installer script. If changed in installer script remember to change here too.
 		let taskName = "exec-fb-messenger-setup";
 		exec("schtasks /RUN /TN " + taskName, function (error: any, stdout: any, stderr: any) {
@@ -129,7 +128,7 @@ export default class AutoUpdateService {
 				console.log("exec error: " + error);
 				if((/The system cannot find the file specified/gm).test(error)) {
 					console.log("Scheduled task not found! Ask user to launch the installer..");
-					let remote = electronRequire("remote");
+					let remote = this.electronRequire("remote");
 					let app = remote.require("app");
 					let path = remote.require("path");
 
@@ -147,8 +146,8 @@ export default class AutoUpdateService {
 
 	download(asset:any) {
 		let interval:any = 0;
-		let FastDownload = electronRequire("fast-download");
-		let remote = electronRequire("remote");
+		let FastDownload = this.electronRequire("fast-download");
+		let remote = this.electronRequire("remote");
 		let path = remote.require("path");
 		let app = remote.require("app");
 		let downloadUrl = asset.browser_download_url;
