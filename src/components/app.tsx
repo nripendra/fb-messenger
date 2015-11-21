@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Login from './login';
 import Chat from './chat';
+import AutoUpdater from "./auto-updater";
 import AppStores from '../appstores';
 import connectToStore from '../decorators/connectToStores';
 
@@ -9,9 +10,15 @@ export default class App extends React.Component<any, any> {
     render() {
 
         if (!AppStores.loginStore.isAuthenticated) {
-            return (<Login store={AppStores.loginStore} />);
+            return (<div>
+                    <AutoUpdater />
+                    <Login store={AppStores.loginStore} />
+            </div>);
         } else {
-            return (<Chat store={AppStores.chatStore} api={AppStores.loginStore.api} />);
+            return (<div>
+                    <AutoUpdater />
+                    <Chat store={AppStores.chatStore} api={AppStores.loginStore.api} />
+            </div>);
         }
     }
 }

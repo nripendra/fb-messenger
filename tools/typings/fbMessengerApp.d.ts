@@ -10,11 +10,15 @@
 
 /// <reference path="../../src/program.tsx" />
 
+/// <reference path="../../src/actions/auto-updateractions.ts" />
+
 /// <reference path="../../src/actions/chatactions.ts" />
 
 /// <reference path="../../src/actions/loginactions.ts" />
 
 /// <reference path="../../src/components/app.tsx" />
+
+/// <reference path="../../src/components/auto-updater.tsx" />
 
 /// <reference path="../../src/components/chat.tsx" />
 
@@ -34,11 +38,13 @@
 
 /// <reference path="../../src/decorators/connectToStores.tsx" />
 
-/// <reference path="../../src/services/auto-update.ts" />
+/// <reference path="../../src/services/auto-updateservice.ts" />
 
 /// <reference path="../../src/services/chatservice.ts" />
 
 /// <reference path="../../src/services/loginservice.ts" />
+
+/// <reference path="../../src/stores/auto-updaterstore.ts" />
 
 /// <reference path="../../src/stores/chatstore.ts" />
 
