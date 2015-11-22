@@ -17,7 +17,7 @@ declare module Flux {
 
         constructor(args: any);
 
-        dispatch(key: string, payload?: any): void;
+        dispatch(key: string, ...payload: any[]): void;
 
         on(event: string, callback: Function): void;
     }

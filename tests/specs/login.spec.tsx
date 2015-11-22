@@ -1,7 +1,8 @@
 /// <reference path="../../tools/typings/jasmine/jasmine.d.ts"/>
 import App from '../../src/components/app';
 import Chat from '../../src/components/chat';
-
+import AutoUpdater from "../../src/components/auto-updater";
+import AutoUpdateService from "../../src/services/auto-updateservice";
 import Login from '../../src/components/login';
 import FriendList from '../../src/components/friendlist';
 import MessageItem from '../../src/components/message-item';
@@ -16,28 +17,36 @@ let ReactTestUtils: any = null;
 let ReactDom: any = null;
 describe("fb-messenger", () => {
     describe("app", () => {
+        beforeEach(function() {
+            spyOn(AutoUpdateService.prototype, "checkForUpdate").and.callFake(function() {
+                return;// noop
+            });
+        });
         it("should show login form", () => {
             AppStores.loginStore.isAuthenticated = false;
-            var myApp = ReactDom.render(<App />, document.getElementById('fb-messenger'));
+            var myApp = ReactDom.render(<App />, document.getElementById("fb-messenger"));
             expect(ReactTestUtils.scryRenderedComponentsWithType(myApp, Login).length).toBe(1);
         });
 
         it("should show chat component when loginStore.isAuthenticated is true", () => {
             AppStores.loginStore.isAuthenticated = true;
-            AppStores.loginStore.api =
-            {
-                setOptions: () => { },
+            AppStores.loginStore.api = {
+                setOptions: () => { return; },
                 getCurrentUserID: () => { return "123" },
                 getFriendsList: function(currentUserId:any, cb:Function){
-                    cb(null, [{'1': {id: '1', name:'Friend1'}}]);
+                    cb(null, [{"1": {id: "1", name:"Friend1"}}]);
                 },
                 getUserInfo: function(data:any, cb:Function){
                     cb({
-                        '1':{id:'1', name:'friend1', thumbSrc:'http://www.marismith.com/wp-content/uploads/2014/07/facebook-profile-blank-face.jpeg'}
+                        "1": {
+                            id:"1",
+                            name:"friend1",
+                            thumbSrc:"http://www.marismith.com/wp-content/uploads/2014/07/facebook-profile-blank-face.jpeg"
+                        }
                     });
-                },
+                }
             };
-            var myApp = ReactDom.render(<App />, document.getElementById('fb-messenger'));
+            var myApp = ReactDom.render(<App />, document.getElementById("fb-messenger"));
             expect(ReactTestUtils.scryRenderedComponentsWithType(myApp, Chat).length).toBe(1);
         });
     });
@@ -144,7 +153,7 @@ describe("fb-messenger", () => {
             expect(ReactTestUtils.scryRenderedComponentsWithType(chatUI, FriendList).length).toBe(1);
             setTimeout(function() {
                 var callouts = ReactTestUtils.scryRenderedDOMComponentsWithClass(chatUI, "callout");
-                expect(ReactDom.findDOMNode(callouts[0]).innerHTML).toBe('hello');
+                expect(ReactDom.findDOMNode(callouts[0]).innerHTML).toMatch('hello');
                 expect(callouts.length).toBe(1);
                 done();
             }, 10);
@@ -157,7 +166,7 @@ describe("fb-messenger", () => {
             var message = {'senderID': '1' ,'messageID':'1','body': 'hello'};
             var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{id: '1'}} currentUser={{id: '10'}} />, document.getElementById('fb-messenger'));
             var callouts = ReactTestUtils.scryRenderedDOMComponentsWithClass(messageItem, "callout");
-            expect(ReactDom.findDOMNode(callouts[0]).innerHTML).toBe('hello');
+            expect(ReactDom.findDOMNode(callouts[0]).innerHTML).toMatch('hello');
         });
         
         it("should show the message body if attachments is empty",() => {
@@ -165,7 +174,7 @@ describe("fb-messenger", () => {
             var message = {'senderID': '1' ,'messageID':'1','body': 'hello', attachments: attachments};
             var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{id: '1'}} currentUser={{id: '10'}} />, document.getElementById('fb-messenger'));
             var callouts = ReactTestUtils.scryRenderedDOMComponentsWithClass(messageItem, "callout");
-            expect(ReactDom.findDOMNode(callouts[0]).innerHTML).toBe('hello');
+            expect(ReactDom.findDOMNode(callouts[0]).innerHTML).toMatch('hello');
         });
         
         it("should show the message sticker if there is one",() => {
@@ -175,8 +184,129 @@ describe("fb-messenger", () => {
             var sticker = ReactTestUtils.scryRenderedDOMComponentsWithTag(messageItem, "img");
             expect(sticker.length).toBe(1);
         });
+        
+        it("should show the emoji icon for emoticons",() => {
+            var message = {'senderID': '1' ,'messageID':'1','body': 'Hello world <3'};
+            var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{id: '1'}} currentUser={{id: '10'}} />, document.getElementById('fb-messenger'));
+            var emoji = ReactTestUtils.scryRenderedDOMComponentsWithClass(messageItem, "em");
+            expect(emoji.length).toBe(1);
+            expect(ReactDom.findDOMNode(emoji[0]).className).toBe('em emj186');
+        });
+        
+        it("should show the emoji icon for unicode emoji",() => {
+            var message = {'senderID': '1' ,'messageID':'1','body': 'Hello world ❤'};
+            var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{id: '1'}} currentUser={{id: '10'}} />, document.getElementById('fb-messenger'));
+            var emoji = ReactTestUtils.scryRenderedDOMComponentsWithClass(messageItem, "em");
+            expect(emoji.length).toBe(1);
+            expect(ReactDom.findDOMNode(emoji[0]).className).toBe('em emj186');
+        });
     });
 
+    describe("auto-updater", ()=> {
+        it("should call checkForUpdate",() => {
+            spyOn(AutoUpdateService.prototype, "checkForUpdate").and.callFake(function() {
+                return;// noop
+            });
+
+            ReactDom.render(<AutoUpdater />, document.getElementById("fb-messenger"));
+            expect(AutoUpdateService.prototype.checkForUpdate).toHaveBeenCalled();
+        });
+    });
+
+    describe("auto-updater-service", ()=> {
+        it("should send request to release api",() => {
+            AppStores.autoUpdaterStore.autoUpdateService.electronRequire = (module: string)=> {
+                return {require: (module: string)=> {
+                    return {
+                        getVersion: ()=> "0.1.0"
+                    };
+                }};
+            };
+
+            var _method = "";
+            var _url = "";
+            var _async = false;
+            spyOn(XMLHttpRequest.prototype, "open").and.callFake(function(method:string, url:string, async:boolean) {
+                _method = method;
+                _url = url;
+                _async = async;
+                return;// noop
+            });
+            spyOn(XMLHttpRequest.prototype, "send").and.callFake(function() {
+                return;// noop
+            });
+
+            ReactDom.render(<AutoUpdater />, document.getElementById("fb-messenger"));
+            expect(XMLHttpRequest.prototype.open).toHaveBeenCalled();
+            expect(XMLHttpRequest.prototype.send).toHaveBeenCalled();
+            expect(_method).toBe("GET");
+            expect(_url).toBe("https://api.github.com/repos/nripendra/fb-messenger/releases");
+            expect(_async).toBe(true);
+        });
+
+        it("should download if released version > current version, and asset's state is 'uploaded'",() => {
+            AppStores.autoUpdaterStore.autoUpdateService.electronRequire = (module: string)=> {
+                return {require: (module: string)=> {
+                    return {
+                        getVersion: ()=> "0.1.0"
+                    };
+                }};
+            };
+
+            var _method = "";
+            var _url = "";
+            var _async = false;
+            spyOn(XMLHttpRequest.prototype, "open").and.callFake(function(method:string, url:string, async:boolean) {
+                _method = method;
+                _url = url;
+                _async = async;
+                return;// noop
+            });
+            spyOn(XMLHttpRequest.prototype, "send").and.callFake(function() {
+                if(this.onreadystatechange != null) {
+                    this.readyState = 4;
+                    this.status = 200;
+                    this.responseText = JSON.stringify([
+                        {tag_name: "0.1.1", prelease: false, assets:[
+                            {
+                                name: "fb-messenger-setup.exe",
+                                state: "uploaded"
+                            }
+                        ]}
+                    ]);
+                    this.onreadystatechange();
+                }
+                return;// noop
+            });
+            spyOn(AutoUpdateService.prototype, "download").and.callFake(function() {
+                return;// noop
+            });
+            spyOn(AutoUpdateService.prototype, "recheckAfter").and.callFake(function() {
+                return;// noop
+            });
+
+            ReactDom.render(<AutoUpdater />, document.getElementById("fb-messenger"));
+            expect(AutoUpdateService.prototype.download).toHaveBeenCalled();
+        });
+
+        beforeEach(function() {
+            var _global = (global as any);
+            _global.XMLHttpRequest = class {
+                onerror:Function;
+                onreadystatechange:Function;
+                readyState:number;
+                status:number;
+				responseText:string;
+                open() {
+                    return;
+                }
+                send() {
+                    return;
+                }
+            };
+        });
+    });
+    
     beforeEach(function() {
     
         (global as any).document = jsdom.jsdom('<!doctype html><html><body><div id="fb-messenger"></div></body></html>');

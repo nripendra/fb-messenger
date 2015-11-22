@@ -2,6 +2,8 @@ import * as React from 'react';
 
 import {Hbox, Vbox} from './layout';
 
+import Emojify from './emojify';
+
 const Avatar = require('material-ui/lib/avatar');
 
 export class MessageItemProps {
@@ -24,7 +26,9 @@ export class MessageContent extends React.Component<MessageContentProps, any> {
 	render() {
 		if((this.props.message.attachments || []).length == 0) {
 			let justify = {'textAlign':'justify'};
-			return (<div className={this.props.className} style={justify}>{this.props.message.body}</div>);
+			return (<div className={this.props.className} style={justify} >
+				<Emojify messageText={this.props.message.body} />
+			</div>);
 		} else {
 			return (<div>
 				{this.props.message.attachments.map((attachment:any) => {
