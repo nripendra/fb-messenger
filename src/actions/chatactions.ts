@@ -10,5 +10,8 @@ export default {
     },
     friendSelected(friend: any): void {
         dispatcher.dispatch('friendSelected', friend);
+    },
+    markAsRead(threadID: string) {
+        dispatcher.dispatch("markAsRead", threadID);
     }
 };

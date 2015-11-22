@@ -6,10 +6,14 @@ import AutoUpdateService from "../../src/services/auto-updateservice";
 import Login from '../../src/components/login';
 import FriendList from '../../src/components/friendlist';
 import MessageItem from '../../src/components/message-item';
+import Conversation from "../../src/components/conversation";
 import AppStores from '../../src/appstores';
 import LoginActions from '../../src/actions/loginactions';
 import LoginService from '../../src/services/loginservice';
 import ChatStore from '../../src/stores/chatstore';
+import ChatActions from '../../src/actions/chatactions';
+
+const TextField = require("material-ui/lib/text-field");
 
 import * as jsdom from 'jsdom';
 let React: any = null;
@@ -29,10 +33,13 @@ describe("fb-messenger", () => {
         });
 
         it("should show chat component when loginStore.isAuthenticated is true", () => {
+            (global as any).electronRequire = (module: string)=> {
+                return {getCurrentWindow: ()=> {return {isFocused: false};}};
+            };
             AppStores.loginStore.isAuthenticated = true;
             AppStores.loginStore.api = {
                 setOptions: () => { return; },
-                getCurrentUserID: () => { return "123" },
+                getCurrentUserID: () => { return "123"; },
                 getFriendsList: function(currentUserId:any, cb:Function){
                     cb(null, [{"1": {id: "1", name:"Friend1"}}]);
                 },
@@ -159,7 +166,77 @@ describe("fb-messenger", () => {
             }, 10);
         });
     });
-    
+
+    describe("conversation", ()=> {
+        it("should send markAsRead if new message arrives when the currentWindow is active and textbox is focused", (done: Function)=> {
+            (global as any).electronRequire = (module: string)=> {
+                return {
+                    getCurrentWindow: ()=> {
+                        return {isFocused: ()=> true};
+                    }
+                };
+            };
+
+            var api = {
+                getCurrentUserID: ()=> { return 10;},
+                markAsRead: ()=> {return;},
+                getFriendsList: ()=> {return;},
+                setOptions: ()=> {return;},
+                getOnlineUsers: ()=> {return;}
+            };
+            AppStores.chatStore.loadFriendList(api);
+
+            spyOn(api, "markAsRead").and.callFake(function() {
+                return;// noop
+            });
+
+            var conversation = ReactDom.render(<Conversation
+                                messages={[{body:"hello", senderID: 1}]}
+                                currentFriend={{id: 1}}
+                                currentUser={{id: 10}} />,
+                            document.getElementById("fb-messenger"));
+            conversation.isFocused = true;
+            conversation.handleTextFieldFocus();
+
+            expect(api.markAsRead).toHaveBeenCalled();
+            setTimeout(done, 5);
+        });
+
+        it("should not markAsRead if there is no new message when the currentWindow is active and textbox is focused", (done: Function)=> {
+            (global as any).electronRequire = (module: string)=> {
+                return {
+                    getCurrentWindow: ()=> {
+                        return {isFocused: ()=> true};
+                    }
+                };
+            };
+
+            var api = {
+                getCurrentUserID: ()=> { return 10;},
+                markAsRead: ()=> {return;},
+                getFriendsList: ()=> {return;},
+                setOptions: ()=> {return;},
+                getOnlineUsers: ()=> {return;}
+            };
+            AppStores.chatStore.loadFriendList(api);
+
+            spyOn(api, "markAsRead").and.callFake(function() {
+                return;// noop
+            });
+
+            var conversation = ReactDom.render(<Conversation
+                                messages={[{body:"hello", senderID: 1, isSeen: true}]}
+                                currentFriend={{id: 1}}
+                                currentUser={{id: 10}} />,
+                            document.getElementById("fb-messenger"));
+            conversation.isFocused = true;
+            conversation.handleTextFieldFocus();
+
+            expect(api.markAsRead).not.toHaveBeenCalled();
+            setTimeout(done, 5);
+        });
+    });
+
     describe("message-item", ()=>
     {
         it("should show the message body if there is no attachments",() => {

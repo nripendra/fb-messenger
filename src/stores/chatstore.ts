@@ -23,7 +23,8 @@ export default class ChatStore extends Store {
         return {
             'initApi': 'loadFriendList',
             'setCurrentChatThread': 'setCurrentChatThread',
-            'friendSelected': 'friendSelected'
+            'friendSelected': 'friendSelected',
+            "markAsRead": "markAsRead"
         };
     }
 
@@ -52,6 +53,20 @@ export default class ChatStore extends Store {
     setCurrentChatThread(chatThread: string) {
         this.currentChatThread = chatThread;
         this.emit('change');
+    }
+
+    markAsRead(threadID: string) {
+        var retryCount = 0;
+        this.chatService.markAsRead(threadID).then(()=> {
+            this.emit("change");
+        }).catch(((err: any) => {
+             if(retryCount < 3) {
+                setTimeout((function(){
+                    this.markAsRead(threadID);
+                    retryCount++;
+                }).bind(this), 1000);
+            }
+        }).bind(this));
     }
 
     listen() {
