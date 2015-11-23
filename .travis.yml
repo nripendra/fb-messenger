@@ -1,18 +1,16 @@
 language: node_js
-before_install:
-  - rvm install 2.0.0
 before_script:
   - npm install -g gulp
 node_js:
-  - "iojs"
+  - "stable"
 script:
-  - gulp build
+  - if [ "$TRAVIS_TAG" = "" ]; then gulp build; else gulp package-win32; fi
 addons:
   apt:
     packages:
     - wine
 before_deploy:
-  - gulp package-win32
+  - gem install mime-types -v 2.6.2
 deploy:
   provider: releases
   api_key: '$GH_KEY'
