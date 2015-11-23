@@ -11,7 +11,7 @@ var atom = require('gulp-atom'),
     gulp = require('gulp'),
     inject = require('gulp-inject'),
     inno = require('gulp-inno'),
-    insert = require('gulp-insert'),
+    //insert = require('gulp-insert'),
     jasmine = require('gulp-jasmine'),
     less = require('gulp-less'),
     plumber = require('gulp-plumber'),
@@ -23,8 +23,8 @@ var atom = require('gulp-atom'),
     spawn = require('child_process').spawn,
     tsc = require('gulp-typescript'),
     transform = require('vinyl-transform'),
-    typescript = require('typescript'),
-    zip = require('gulp-zip');
+    typescript = require('typescript');
+    //zip = require('gulp-zip');
 
 var config = new Config();
 var tsconfig = tsc.createProject('tsconfig.json', {typescript: typescript});
@@ -103,11 +103,11 @@ gulp.task('compile-ts', ['gen-ts-refs'], function () {
         .pipe(gulp.dest(config.tsOutputPath))
 });
 
-gulp.task('append-runner', ['compile-ts'], function () {
-    return gulp.src(config.tsOutputPath + "program.js")
-        .pipe(insert.append('\n\ndocument.addEventListener("DOMContentLoaded", function(e){require("./Program").main();});'))
-        .pipe(gulp.dest(config.tsOutputPath))
-});
+// gulp.task('append-runner', ['compile-ts'], function () {
+//     return gulp.src(config.tsOutputPath + "program.js")
+//         .pipe(insert.append('\n\ndocument.addEventListener("DOMContentLoaded", function(e){require("./Program").main();});'))
+//         .pipe(gulp.dest(config.tsOutputPath))
+// });
 
 gulp.task('copy-jsx', function () {
     return gulp.src(config.source + '**/*.jsx')

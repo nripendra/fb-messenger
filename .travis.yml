@@ -4,14 +4,17 @@ before_script:
 node_js:
   - "stable"
 script:
-  - gulp build
+  - if [ "$TRAVIS_TAG" == "" ]; then
+      gulp build;
+    else
+      gulp package-win32
+    fi
 addons:
   apt:
     packages:
     - wine
 before_deploy:
   - gem install mime-types -v 2.6.2
-  - gulp package-win32
 deploy:
   provider: releases
   api_key: '$GH_KEY'
