@@ -1,0 +1,6 @@
+[submodule "node-fast-download"]
+	path = node-fast-download
+	url = https://github.com/nripendra/node-fast-download.git
+[submodule "facebook-chat-api"]
+	path = facebook-chat-api
+	url = https://github.com/nripendra/facebook-chat-api.git

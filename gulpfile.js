@@ -1,7 +1,6 @@
 'use strict';
 
-var atom = require('gulp-atom'),
-    babel = require("gulp-babel"),
+var babel = require("gulp-babel"),
     babelify = require("babelify"),
     Browserify = require('browserify'),
     Config = require('./gulpfile.config'),
@@ -11,7 +10,7 @@ var atom = require('gulp-atom'),
     gulp = require('gulp'),
     inject = require('gulp-inject'),
     inno = require('gulp-inno'),
-    insert = require('gulp-insert'),
+    //insert = require('gulp-insert'),
     jasmine = require('gulp-jasmine'),
     less = require('gulp-less'),
     plumber = require('gulp-plumber'),
@@ -23,8 +22,8 @@ var atom = require('gulp-atom'),
     spawn = require('child_process').spawn,
     tsc = require('gulp-typescript'),
     transform = require('vinyl-transform'),
-    typescript = require('typescript'),
-    zip = require('gulp-zip');
+    typescript = require('typescript');
+    //zip = require('gulp-zip');
 
 var config = new Config();
 var tsconfig = tsc.createProject('tsconfig.json', {typescript: typescript});
@@ -103,11 +102,11 @@ gulp.task('compile-ts', ['gen-ts-refs'], function () {
         .pipe(gulp.dest(config.tsOutputPath))
 });
 
-gulp.task('append-runner', ['compile-ts'], function () {
-    return gulp.src(config.tsOutputPath + "program.js")
-        .pipe(insert.append('\n\ndocument.addEventListener("DOMContentLoaded", function(e){require("./Program").main();});'))
-        .pipe(gulp.dest(config.tsOutputPath))
-});
+// gulp.task('append-runner', ['compile-ts'], function () {
+//     return gulp.src(config.tsOutputPath + "program.js")
+//         .pipe(insert.append('\n\ndocument.addEventListener("DOMContentLoaded", function(e){require("./Program").main();});'))
+//         .pipe(gulp.dest(config.tsOutputPath))
+// });
 
 gulp.task('copy-jsx', function () {
     return gulp.src(config.source + '**/*.jsx')
@@ -134,8 +133,11 @@ gulp.task('browserify-bundle', ['copy-jsx','compile-ts'], function (cb) {
 });
 
 gulp.task('browserify-copy_node_modules', function () {
-    return gulp.src(['./node_modules/facebook-chat-api/**/*'], { "base" : "." })
-        .pipe(gulp.dest('./out/compile/'));
+    return gulp.src(['./node_modules/facebook-chat-api/**/*',
+                     './node_modules/fast-download/**/*',
+                     './node_modules/lodash/**/*'
+                    ], { "base" : "." })
+               .pipe(gulp.dest('./out/compile/'));
 });
 
 gulp.task('browserify', function (cb) {
@@ -175,7 +177,7 @@ gulp.task('copy-static', function () {
         .pipe(gulp.dest(config.compiled));
 });
 
-var electronVersion = 'v0.34.3';
+var electronVersion = 'v0.35.0';
 
 gulp.task('atom-kill', function (cb) {
     if(process.platform == 'win32'){
