@@ -1,6 +1,13 @@
 {
   "name": "fb-messenger",
-  "version": "0.1.0-alpha.1",
+  "repository": {
+    "type": "git",
+    "url": "nripendra/fb-messenger"
+  },
+  "bugs": {
+    "url": "https://github.com/nripendra/fb-messenger/issues"
+  },
+  "version": "0.1.0-alpha.3",
   "description": "facebook messenger",
   "main": "index.js",
   "scripts": {
@@ -20,23 +27,20 @@
     "del": "^2.0.2",
     "glob": "^5.0.14",
     "gulp": "^3.9.0",
-    "gulp-atom": "^0.1.0",
     "gulp-babel": "^5.2.0",
     "gulp-batch-replace": "0.0.0",
     "gulp-electron": "0.0.9",
     "gulp-inject": "^3.0.0",
     "gulp-inno": "0.0.7",
-    "gulp-insert": "^0.5.0",
     "gulp-jasmine": "^2.0.1",
     "gulp-less": "^3.0.3",
     "gulp-plumber": "^1.0.1",
     "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-typescript": "^2.9.2",
-    "gulp-zip": "^3.0.2",
     "h5f": "^1.1.1",
     "jsdom": "^6.1.0",
-    "react-addons-test-utils": "^0.14.2",
+    "react-addons-test-utils": "^0.14.3",
     "run-sequence": "^1.1.4",
     "typescript": "git+https://github.com/Microsoft/TypeScript.git",
     "vinyl-source-stream": "^1.1.0",
@@ -44,13 +48,14 @@
   },
   "dependencies": {
     "delorean": "^0.9.4",
-    "facebook-chat-api": "^1.0.3",
+    "facebook-chat-api": "file:facebook-chat-api",
+    "fast-download": "file:node-fast-download",
     "lodash": "^3.10.1",
     "lodash.debounce": "^3.1.1",
     "lodash.throttle": "^3.0.4",
     "material-ui": "^0.13.1",
-    "fast-download": "^0.3.5",
-    "react": "^0.14.2",
+    "react": "^0.14.3",
+    "react-dom": "^0.14.3",
     "react-tap-event-plugin": "^0.2.1",
     "semver": "^5.1.0"
   }
