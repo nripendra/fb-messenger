@@ -1,7 +1,6 @@
 'use strict';
 
-var atom = require('gulp-atom'),
-    babel = require("gulp-babel"),
+var babel = require("gulp-babel"),
     babelify = require("babelify"),
     Browserify = require('browserify'),
     Config = require('./gulpfile.config'),
