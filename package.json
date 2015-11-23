@@ -44,12 +44,12 @@
   },
   "dependencies": {
     "delorean": "^0.9.4",
-    "facebook-chat-api": "^1.0.3",
+    "facebook-chat-api": "file:facebook-chat-api",
+    "fast-download": "file:node-fast-download",
     "lodash": "^3.10.1",
     "lodash.debounce": "^3.1.1",
     "lodash.throttle": "^3.0.4",
     "material-ui": "^0.13.1",
-    "fast-download": "^0.3.5",
     "react": "^0.14.2",
     "react-tap-event-plugin": "^0.2.1",
     "semver": "^5.1.0"
