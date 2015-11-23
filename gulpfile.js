@@ -134,8 +134,11 @@ gulp.task('browserify-bundle', ['copy-jsx','compile-ts'], function (cb) {
 });
 
 gulp.task('browserify-copy_node_modules', function () {
-    return gulp.src(['./node_modules/facebook-chat-api/**/*'], { "base" : "." })
-        .pipe(gulp.dest('./out/compile/'));
+    return gulp.src(['./node_modules/facebook-chat-api/**/*',
+                     './node_modules/fast-download/**/*',
+                     './node_modules/lodash/**/*'
+                    ], { "base" : "." })
+               .pipe(gulp.dest('./out/compile/'));
 });
 
 gulp.task('browserify', function (cb) {
@@ -175,7 +178,7 @@ gulp.task('copy-static', function () {
         .pipe(gulp.dest(config.compiled));
 });
 
-var electronVersion = 'v0.34.3';
+var electronVersion = 'v0.35.0';
 
 gulp.task('atom-kill', function (cb) {
     if(process.platform == 'win32'){
