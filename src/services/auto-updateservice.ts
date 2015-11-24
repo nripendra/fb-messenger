@@ -141,12 +141,12 @@ export default class AutoUpdateService {
 			} else {
 				AutoUpdaterActions.showRestartConfirmation();
 			}
-		});
+		}.bind(this));
 	}
 
 	download(asset:any) {
+		const FastDownload = this.electronRequire("fast-download");
 		let interval:any = 0;
-		let FastDownload = this.electronRequire("fast-download");
 		let remote = this.electronRequire("remote");
 		let path = remote.require("path");
 		let app = remote.require("app");

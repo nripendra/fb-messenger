@@ -27,22 +27,22 @@ export default class AutoUpdater extends React.Component<any, any> {
 
     render() {
         var store = AppStores.autoUpdaterStore;
-        if(store.showUpdaterStatus) {
-            if(store.showInstallerAndRestartConfirmation) {
-                return ( <Snackbar
-                            message="An update is downloaded."
-                            action="Install"
-                            openOnMount={true}
-                            autoHideDuration={20000}
-                            onActionTouchTap={this._handleLaunchInstaller}/>);
-            } else if (store.showRestartConfirmation) {
-                return (<Snackbar
-                            message="Application has been updated."
-                            action="Restart"
-                            autoHideDuration={20000}
-                            openOnMount={true}
-                            onActionTouchTap={this._restart}/>);
-            } else if(store.isCheckingForUpdate) {
+        if(store.showInstallerAndRestartConfirmation) {
+            return ( <Snackbar
+                        message="An update is downloaded."
+                        action="Install"
+                        openOnMount={true}
+                        autoHideDuration={20000}
+                        onActionTouchTap={this._handleLaunchInstaller}/>);
+        } else if (store.showRestartConfirmation) {
+            return (<Snackbar
+                        message="Application has been updated."
+                        action="Restart"
+                        autoHideDuration={20000}
+                        openOnMount={true}
+                        onActionTouchTap={this._restart}/>);
+        } else if(store.showUpdaterStatus) {
+            if(store.isCheckingForUpdate) {
                 return <LinearProgress mode="indeterminate" />;
             } else {
                 return <LinearProgress mode="determinate" value={store.downloadProgress} />;

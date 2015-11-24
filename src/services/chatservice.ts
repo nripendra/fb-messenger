@@ -20,33 +20,54 @@ export default class ChatService {
         return this.api.getCurrentUserID();
     }
 
-    getFriendList(): Promise<Array<any>> {
+    getCurrentUserInfo(): Promise<any> {
         var api = this.api;
         var currentUserId = this.api.getCurrentUserID();
-        var getFriendsList = new Promise(function(resolve: Function, reject: Function) {
-            api.getFriendsList(currentUserId, function(err: any, data: Array<any>) {
+        return new Promise(function(resolve: Function, reject: Function) {
+            console.log("Fetching my detail..");
+            api.getUserInfo([currentUserId], function(err: any, ret: Array<any>) {
                 if (err) {
                     reject(err);
                 } else {
-                    data.unshift(currentUserId);
-                    
-                    api.getUserInfo(data, function(err: any, ret: Array<any>) {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(ret);
-                        }
-                    });
+                    var info = ret[currentUserId];
+                    info.userID = currentUserId;
+                    info.fullName = (info.fullName || info.name || info.firstName);
+                    info.profilePicture = info.profilePicture || info.thumbSrc;
+                    resolve(info);
+                    console.groupCollapsed("got my details..");
+                    console.log(info);
+                    console.groupEnd();
+                }
+            });
+        });
+    }
+    
+    getFriendList(): Promise<Array<any>> {
+        var api = this.api;
+        var getFriendsList = new Promise(function(resolve: Function, reject: Function) {
+            console.log("Fetching Friends..")
+            api.getFriendsList(function(err: any, data: Array<any>) {
+                if (err) {
+                    reject(err);
+                } else {
+                    console.groupCollapsed("got Friends..");
+                    console.log(data);
+                    console.groupEnd();
+                    resolve(data);
                 }
 
             });
         });
         
         var getOnlineFriends = new Promise(function(resolve: Function, reject: Function) {
+            console.log("Fetching online friends..");
             api.getOnlineUsers(function(err: any, data: Array<any>) {
                 if (err) {
                     reject(err);
                 } else {
+                    console.groupCollapsed("got online friends..");
+                    console.log(data);
+                    console.groupEnd();
                     resolve(data);
                 }
 
@@ -55,14 +76,20 @@ export default class ChatService {
         
         return new Promise(function(resolve: Function, reject: Function) {
             Promise.all([getFriendsList, getOnlineFriends]).then((zipped)=>{
-                var usermap = zipped[0];
+                var usermap = zipped[0] as Array<any>;
                 var olUsers = zipped[1] as Array<any>;
-                olUsers.forEach(x => {
-                    if(usermap.hasOwnProperty(x.userID)){
-                         usermap[x.userID].presence = x;
-                         usermap[x.userID].presence.statuses = usermap[x.userID].presence.statuses || {status: 'active'};
+                usermap.forEach(u => {
+                    u.presence = {status: "offline"};
+                    for(let status of olUsers){
+                        if(u.userID == status.userID) {
+                            u.presence = status;
+                            break;
+                        }
                     }
                 });
+                console.groupCollapsed("merged friends + online..");
+                console.log(usermap.filter(x => x.presence.status != "offline"));
+                console.groupEnd();
                 resolve(usermap);
             }).catch(err =>{
                 console.log(err);
