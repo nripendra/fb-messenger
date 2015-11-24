@@ -136,7 +136,7 @@ gulp.task('browserify-copy_node_modules', function () {
     var modules = ["ansi", "are-we-there-yet", "asn1", "assert-plus", "assert-plus", "async", "aws-sign2", "bl", "bluebird", 
     "boolbase", "boom", "caseless", "cheerio", "combined-stream", "cryptiles", "css-select", "css-what", 
     "dashdash", "delayed-stream", "delegates", "dom-serializer", "domelementtype","domhandler", "domutils", "ecc-jsbn", 
-    "entities", "extend", "extsprintf", "facebook-chat-api", "forever-agent", "form-data-rc3", "gauge", "generate-function", 
+    "entities", "extend", "extsprintf", "facebook-chat-api", "fast-download", "forever-agent", "form-data-rc3", "gauge", "generate-function", 
     "generate-object-property", "har-validator", "has-unicode", "hawk", "hoek", "htmlparser2", "http-signature", 
     "is-my-json-valid", "is-property", "is-typedarray", "isstream", "jodid25519", "jsbn", "json-schema", "json-stringify-safe", 
     "jsonpointer", "jsprim", "lodash", "lodash._basetostring", "lodash._createpadding", "lodash.pad", "lodash.padleft", "lodash.padright", 
