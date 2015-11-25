@@ -140,7 +140,8 @@ gulp.task('browserify-copy_node_modules', function () {
     "generate-object-property", "har-validator", "has-unicode", "hawk", "hoek", "htmlparser2", "http-signature", 
     "is-my-json-valid", "is-property", "is-typedarray", "isstream", "jodid25519", "jsbn", "json-schema", "json-stringify-safe", 
     "jsonpointer", "jsprim", "lodash", "lodash._basetostring", "lodash._createpadding", "lodash.pad", "lodash.padleft", "lodash.padright", 
-    "lodash.repeat", "mime-db", "mime-types", "node-uuid", "npmlog", "nth-check", "oauth-sign", "pinkie-promise","qs", "readable-stream", "request", "sntp", "sshpk", "stringstream", "tunnel-agent", "tweetnacl", "verror", "xtend"]
+    "lodash.repeat", "mime-db", "mime-types", "node-uuid", "npmlog", "nth-check", "oauth-sign", "pinkie-promise","qs", "readable-stream", "request", "sntp", "sshpk", "stringstream", 
+    "tough-cookie", "tunnel-agent", "tweetnacl", "verror", "xtend"]
                     .map(function(x){return './node_modules/' + x + '/**/*'; });
     return gulp.src(modules, { "base" : "." })
                .pipe(gulp.dest('./out/compile/'));
