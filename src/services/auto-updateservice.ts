@@ -109,6 +109,19 @@ export default class AutoUpdateService {
 			console.log("Already scheduled at this time");
 		}
 	}
+	
+	restart() {
+		let path = this.electronRequire("path");
+		let remote = this.electronRequire("remote");
+		let execPath = (global as any).process.execPath
+		// file will always be installed in form of fb-messenger\version\fb-messenter.exe
+		let dir = path.dirname(path.dirname(execPath));
+		let restartFile = path.join(dir, "restart.bat");
+		let exeName = path.basename(execPath).replace(".exe","");
+		let exec = remote.require("child_process").exec;
+		exec('"' + restartFile + '" "' + exeName + '.exe" "' + exeName + '.lnk"',[], function(e:any,s:any,o:any){
+			console.log(e);console.log(s);console.log(o); });
+	}
 
 	launchInstaller(pathOfInstaller: string) {
 		console.log("launching " + pathOfInstaller + "...");

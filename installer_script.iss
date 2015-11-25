@@ -65,6 +65,8 @@ PrivilegesRequired=admin
 DisableDirPage=auto
 DirExistsWarning=no
 AppId=7E4831F5-26DB-41DD-AC9C-D0501E894397
+DefaultGroupName={#MyAppName}
+DisableProgramGroupPage=yes
 
 [Registry]
 ;Autostart program on windows start
@@ -74,8 +76,10 @@ Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 ;scheduler needs to be configured using xml because, by default a taks created using schtasks sets 'Start the task only if the computer is on AC power' to true,
 ;and there dosen't seem to be a way to modify that flag through command only...
 source: "./scheduler.xml"; DestDir: {tmp}; DestName: {#MyAppName}-{#MyAppVer}-scheduler.xml; AfterInstall: SetSchedulerValues
+;restart script
+source: "./restart.bat";  DestDir: "{code:GetAppDir}"; DestName: restart.bat;
 ;All files to be packaged into application
-Source: "{#PackageFiles}"; DestDir: "{code:GetAppDir}\{#MyAppVer}"; Flags: recursesubdirs;
+Source: "{#PackageFiles}"; DestDir: "{code:GetAppDir}\{#MyAppVer}"; Flags: recursesubdirs; Excludes: "*.tmp"
 
 [UninstallRun]
 ;Kill all instances of application before uninstall.

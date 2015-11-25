@@ -22,7 +22,7 @@ export default class AutoUpdater extends React.Component<any, any> {
 
     _restart() {
         AutoUpdaterActions.hideRestartConfirmation();
-        // restart logic here...
+        AutoUpdaterActions.restart();
     }
 
     render() {
