@@ -138,7 +138,7 @@ gulp.task('browserify-copy_node_modules', function () {
     "caseless", "cheerio", "combined-stream", "core-util-is", "cryptiles", "css-select", "css-what", 
     "dashdash", "delayed-stream", "delegates", "dom-serializer", "domelementtype","domhandler", "domutils", 
     "ecc-jsbn", "entities", "extend", "extsprintf", 
-    "facebook-chat-api", "fast-download", "forever-agent", "form-data-rc3", 
+    "facebook-chat-api", "fast-download", "forever-agent", "form-data", "form-data-rc3", 
     "gauge", "generate-function", 
     "generate-object-property", 
     "har-validator", "has-unicode", "hawk", "hoek", "htmlparser2", "http-signature", 
