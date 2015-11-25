@@ -30,6 +30,7 @@ export default class AutoUpdateService {
 
 		request.onreadystatechange = (function() {
 			if (request.readyState === 4 && request.status === 200) {
+				console.log("Completed downloading update feed");
 				let recheckTimeout = Time._1Hour;
 				let releases = JSON.parse(request.responseText) || [];
 				let latestRelease = (releases.length > 0) ? releases[0] : {tag_name: "0.0.0", prelease: true, assets:[]};
@@ -39,11 +40,11 @@ export default class AutoUpdateService {
 				var assetFound:boolean = false;
 
 				if(eligible) {
+					console.log("There is newer version than the currently installed one. Checking for downlodable installer...");
 					for(let asset of latestRelease.assets || []) {
 						if(this.checkPlatform(asset)) {
 							if(asset.state === "uploaded") {
 								assetFound = true;
-								console.log("About to download.");
 								this.download(asset);
 								recheckTimeout = Time._6Hours;
 								break;
@@ -53,6 +54,7 @@ export default class AutoUpdateService {
 				}
 
 				if(!assetFound) {
+					console.log("No assets found for download");
 					recheckTimeout = Time._5Minutes;
 					AutoUpdaterActions.updateFeedDownloaded();
 					AutoUpdaterActions.setDownloadProgress(100);
@@ -61,7 +63,7 @@ export default class AutoUpdateService {
 			}
 		}).bind(this);
 		request.open("GET", this.URL, true);
-		console.log("Requesting...");
+		console.log("Checking for updates...");
 		request.send();
 	}
 
@@ -154,8 +156,10 @@ export default class AutoUpdateService {
 		let dataDir = app.getDataPath();
 		let downloadPath = path.join(dataDir, asset.name);
 		// support resuming previous download
+		console.group("downloading...")
+		console.log("Configuring download");
 		AutoUpdaterActions.setFileSize((Math.floor(asset.size/1024/1024*100)/100));
-		let dl = new FastDownload(downloadUrl, {destFile: downloadPath, content_type: asset.content_type, file_size: asset.size});
+		let dl = new FastDownload(downloadUrl, {destFile: downloadPath, content_type: asset.content_type, file_size: asset.size, accept_ranges: true});
 		dl.on("error", function(error:any){
 			clearInterval(interval);
 			this.onNetworkError(2, error);
@@ -168,6 +172,7 @@ export default class AutoUpdateService {
 		});
 
 		dl.on("progress", function(downloaded: number){
+			console.log("completed dowloading: %d", (Math.floor(dl.downloaded/dl.size*10000)/100));
 			AutoUpdaterActions.setDownloadProgress((Math.floor(dl.downloaded/dl.size*10000)/100));
 		});
 
@@ -175,6 +180,7 @@ export default class AutoUpdateService {
 			AutoUpdaterActions.setDownloadProgress(100);
 			this.launchScheduledInstallerTask(asset);
 			clearInterval(interval);
+			console.groupEnd();
 		}.bind(this));
 	}
 }
