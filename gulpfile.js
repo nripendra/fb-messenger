@@ -222,7 +222,7 @@ gulp.task('atom-create', ['atom-clean', 'browserify', 'copy-static'], function (
         cache: './electron/cache',
         version: electronVersion,
         packaging: false,
-        asar: true,
+        asar: false,
         platforms: ['win32-ia32'],//, 'darwin-x64'],
         platformResources: {
             // darwin: {
