@@ -53,9 +53,17 @@ export default class ConversationHistory extends React.Component<ConversationHis
                 justifyContent: 'flex-end'
             }
         };
+        var currentFriend = this.props.currentFriend;
         
         return (<CardText style={styles.messageListScrollPane}>
-                    <Vbox style={styles.messageList}>{this.renderMessages()}</Vbox>
+                    <Vbox style={styles.messageList}>
+                        {this.renderMessages()}
+                        <div className={currentFriend.isTyping === true ? "typing-indicator" : ""}>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </Vbox>
                 </CardText>);
     }
     

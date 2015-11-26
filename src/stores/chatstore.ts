@@ -114,6 +114,10 @@ syscall: "connect"
         }.bind(this));
         
         this.chatService.listener.on('typ', function(event: any, stopListening: Function) {
+            if(this.currentFriend && this.currentFriend.userID == event.from) {
+                this.currentFriend.isTyping = event.isTyping;
+                this.emit('change');
+            }
             console.log(event);
         }.bind(this));
 
