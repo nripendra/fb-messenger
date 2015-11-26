@@ -59,15 +59,14 @@ export default class ChatStore extends Store {
         this.emit('change');
     }
 
-    markAsRead(threadID: string) {
-        var retryCount = 0;
+    markAsRead(threadID: string, retryCount?: number) {
+        retryCount = retryCount || 0;
         this.chatService.markAsRead(threadID).then(()=> {
             this.emit("change");
         }).catch(((err: any) => {
              if(retryCount < 3) {
                 setTimeout((function(){
-                    this.markAsRead(threadID);
-                    retryCount++;
+                    this.markAsRead(threadID, retryCount++);
                 }).bind(this), 1000);
             }
         }).bind(this));
@@ -114,6 +113,10 @@ syscall: "connect"
         }.bind(this));
         
         this.chatService.listener.on('typ', function(event: any, stopListening: Function) {
+            if(this.currentFriend && this.currentFriend.userID == event.from) {
+                this.currentFriend.isTyping = event.isTyping;
+                this.emit('change');
+            }
             console.log(event);
         }.bind(this));
 
