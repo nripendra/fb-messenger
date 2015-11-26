@@ -16,6 +16,8 @@
 
 /// <reference path="../../src/actions/loginactions.ts" />
 
+/// <reference path="../../src/decorators/connectToStores.tsx" />
+
 /// <reference path="../../src/components/app.tsx" />
 
 /// <reference path="../../src/components/auto-updater.tsx" />
@@ -35,8 +37,6 @@
 /// <reference path="../../src/components/login.tsx" />
 
 /// <reference path="../../src/components/message-item.tsx" />
-
-/// <reference path="../../src/decorators/connectToStores.tsx" />
 
 /// <reference path="../../src/services/auto-updateservice.ts" />
 
