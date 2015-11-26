@@ -60,7 +60,7 @@ export default class Conversation extends React.Component<ConversationProps, any
             if(this.isFocused && currentWindow.isFocused() && this.hasUnreadMessage()) {
                 console.log("marking as read");
                 let currentFriend = this.props.currentFriend;
-                ChatActions.markAsRead(currentFriend.id);
+                ChatActions.markAsRead(currentFriend.userID);
             }
         }
     }
@@ -70,7 +70,7 @@ export default class Conversation extends React.Component<ConversationProps, any
         var currentUser = this.props.currentUser;
         var needMarking: boolean = false;
         messages.forEach((m: any) => {
-            if((m.isSeen || false) === false && m.senderID !== currentUser.id) {
+            if((m.isSeen || false) === false && m.senderID !== currentUser.userID) {
                needMarking = true;
             }
             m.isSeen = true;
