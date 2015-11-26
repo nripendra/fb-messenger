@@ -12,6 +12,7 @@ import LoginActions from '../../src/actions/loginactions';
 import LoginService from '../../src/services/loginservice';
 import ChatStore from '../../src/stores/chatstore';
 import ChatActions from '../../src/actions/chatactions';
+import TypingIndicator from '../../src/components/typing-indicator';
 
 const TextField = require("material-ui/lib/text-field");
 
@@ -275,6 +276,33 @@ describe("fb-messenger", () => {
             var emoji = ReactTestUtils.scryRenderedDOMComponentsWithClass(messageItem, "em");
             expect(emoji.length).toBe(1);
             expect(ReactDom.findDOMNode(emoji[0]).className).toBe('em emj186');
+        });
+    });
+    
+    describe("typing-indicator", ()=>
+    {
+        it("should show typing indicator when user's isTyping property is set to true",() => {
+            var typingIndicator = ReactDom.render(<TypingIndicator currentFriend={{userID: '1', isTyping: true, profilePicture: 'http://propic1.com/'}} />, document.getElementById('fb-messenger'));
+            var indicator = ReactTestUtils.scryRenderedDOMComponentsWithClass(typingIndicator, "typing-indicator");
+            expect(indicator.length).toBe(1);
+        });
+        
+        it("shouldn't show typing indicator when user's isTyping property is set to false",() => {
+            var typingIndicator = ReactDom.render(<TypingIndicator currentFriend={{userID: '1', isTyping: false, profilePicture: 'http://propic1.com/'}} />, document.getElementById('fb-messenger'));
+            var indicator = ReactTestUtils.scryRenderedDOMComponentsWithClass(typingIndicator, "typing-indicator");
+            expect(indicator.length).toBe(0);
+        });
+        
+        it("should show user's thumbnail profile picture if isTyping property is set to true",() => {
+            var typingIndicator = ReactDom.render(<TypingIndicator currentFriend={{userID: '1', isTyping: true, profilePicture: 'http://propic1.com/'}} />, document.getElementById('fb-messenger'));
+            var thumbnail = ReactTestUtils.scryRenderedDOMComponentsWithTag(typingIndicator, "img");
+            expect(thumbnail.length).toBe(1);
+        });
+        
+        it("shouldn't show user's thumbnail profile picture if isTyping property is set to flase",() => {
+            var typingIndicator = ReactDom.render(<TypingIndicator currentFriend={{userID: '1', isTyping: false, profilePicture: 'http://propic1.com/'}} />, document.getElementById('fb-messenger'));
+            var thumbnail = ReactTestUtils.scryRenderedDOMComponentsWithTag(typingIndicator, "img");
+            expect(thumbnail.length).toBe(0);
         });
     });
 
