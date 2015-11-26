@@ -36,6 +36,8 @@
 
 /// <reference path="../../src/components/message-item.tsx" />
 
+/// <reference path="../../src/components/typing-indicator.tsx" />
+
 /// <reference path="../../src/decorators/connectToStores.tsx" />
 
 /// <reference path="../../src/services/auto-updateservice.ts" />

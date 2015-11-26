@@ -3,6 +3,7 @@ import * as ReactDom from 'react-dom';
 
 import {Hbox, Vbox} from './layout';
 import MessageItem from './message-item';
+import TypingIndicator from "./typing-indicator";
 
 const Cards = require('material-ui/lib/card');
 const Card = Cards.Card;
@@ -53,16 +54,10 @@ export default class ConversationHistory extends React.Component<ConversationHis
                 justifyContent: 'flex-end'
             }
         };
-        var currentFriend = this.props.currentFriend;
-        
         return (<CardText style={styles.messageListScrollPane}>
                     <Vbox style={styles.messageList}>
                         {this.renderMessages()}
-                        <div className={currentFriend.isTyping === true ? "typing-indicator" : ""}>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
+                        <TypingIndicator currentFriend={this.props.currentFriend} />
                     </Vbox>
                 </CardText>);
     }
