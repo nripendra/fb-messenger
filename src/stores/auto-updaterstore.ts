@@ -28,7 +28,8 @@ export default class AutoUpdaterStore extends Store {
             "setShowUpdaterStatus": "setShowUpdaterStatus",
             "setShowInstallerAndRestartConfirmation": "setShowInstallerAndRestartConfirmation",
             "setShowRestartConfirmation": "setShowRestartConfirmation",
-            "launchInstaller": "launchInstaller"
+            "launchInstaller": "launchInstaller",
+            "restart": "restart"
         };
     }
 
@@ -80,6 +81,10 @@ export default class AutoUpdaterStore extends Store {
 
     launchInstaller() {
         this.autoUpdateService.launchInstaller(this.pathOfInstaller);
+    }
+    
+    restart() {
+        this.autoUpdateService.restart();
     }
 
     getState() {

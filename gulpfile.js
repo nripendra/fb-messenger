@@ -133,10 +133,31 @@ gulp.task('browserify-bundle', ['copy-jsx','compile-ts'], function (cb) {
 });
 
 gulp.task('browserify-copy_node_modules', function () {
-    return gulp.src(['./node_modules/facebook-chat-api/**/*',
-                     './node_modules/fast-download/**/*',
-                     './node_modules/lodash/**/*'
-                    ], { "base" : "." })
+    var modules = ["ansi", "are-we-there-yet", "asn1", "assert-plus", "assert-plus", "async", "aws-sign2", 
+    "bl", "bluebird", "boolbase", "boom", 
+    "caseless", "cheerio", "combined-stream", "core-util-is", "cryptiles", "css-select", "css-what", 
+    "dashdash", "delayed-stream", "delegates", "dom-serializer", "domelementtype","domhandler", "domutils", 
+    "ecc-jsbn", "entities", "extend", "extsprintf", 
+    "facebook-chat-api", "fast-download", "forever-agent", "form-data", "form-data-rc3", 
+    "gauge", "generate-function", 
+    "generate-object-property", 
+    "har-validator", "has-unicode", "hawk", "hoek", "htmlparser2", "http-signature", 
+    "inherits", "isarray", "is-my-json-valid", "is-property", "is-typedarray", "isstream", 
+    "jodid25519", "jsbn", "json-schema", "json-stringify-safe", "jsonpointer", "jsprim", 
+    "lodash", "lodash._basetostring", "lodash._createpadding", "lodash.pad", "lodash.padleft", "lodash.padright", "lodash.repeat", 
+    "mime-db", "mime-types", 
+    "node-uuid", "npmlog", "nth-check", 
+    "oauth-sign", 
+    "pinkie-promise", "process-nextick-args",
+    "qs", 
+    "readable-stream", "request", 
+    "sntp", "sshpk", "string_decoder", "stringstream", 
+    "tough-cookie", "tunnel-agent", "tweetnacl", 
+    "util-deprecate", 
+    "verror", 
+    "xtend"]
+                    .map(function(x){return './node_modules/' + x + '/**/*'; });
+    return gulp.src(modules, { "base" : "." })
                .pipe(gulp.dest('./out/compile/'));
 });
 
@@ -201,7 +222,7 @@ gulp.task('atom-create', ['atom-clean', 'browserify', 'copy-static'], function (
         cache: './electron/cache',
         version: electronVersion,
         packaging: false,
-        asar: true,
+        asar: false,
         platforms: ['win32-ia32'],//, 'darwin-x64'],
         platformResources: {
             // darwin: {

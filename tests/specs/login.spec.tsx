@@ -145,23 +145,22 @@ describe("fb-messenger", () => {
                 setOptions: function(){},
                 getCurrentUserID: function(){return "0"},
                 getFriendsList: function(currentUserId:any, cb:Function){
-                    cb(null, [{'1': {id: '1', name:'Friend1'}}]);
+                    cb(null, [{userID: '1', name:'Friend1'}]);
                 },
                 getUserInfo: function(data:any, cb:Function){
-                    cb({
-                        '1':{id:'1', name:'friend1', thumbSrc:'http://www.marismith.com/wp-content/uploads/2014/07/facebook-profile-blank-face.jpeg'}
-                    });
+                    cb([{userID:'1', name:'friend1', thumbSrc:'http://www.marismith.com/wp-content/uploads/2014/07/facebook-profile-blank-face.jpeg'}]);
                 },
             };
             
-            AppStores.chatStore.currentFriend = {id: '1'};
+            AppStores.chatStore.currentUser = {userID: '10'};
+            AppStores.chatStore.currentFriend = {userID: '1'};
             AppStores.chatStore.messages['1'] = [{'messageID':'1','body': 'hello', attachments: []}];
             var chatUI = ReactDom.render(<Chat store={AppStores.chatStore} api={AppStores.loginStore.api} />, document.getElementById('fb-messenger'));
             expect(ReactTestUtils.scryRenderedComponentsWithType(chatUI, FriendList).length).toBe(1);
             setTimeout(function() {
                 var callouts = ReactTestUtils.scryRenderedDOMComponentsWithClass(chatUI, "callout");
-                expect(ReactDom.findDOMNode(callouts[0]).innerHTML).toMatch('hello');
                 expect(callouts.length).toBe(1);
+                expect(ReactDom.findDOMNode(callouts[0]).innerHTML).toMatch('hello');
                 done();
             }, 10);
         });
@@ -241,7 +240,7 @@ describe("fb-messenger", () => {
     {
         it("should show the message body if there is no attachments",() => {
             var message = {'senderID': '1' ,'messageID':'1','body': 'hello'};
-            var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{id: '1'}} currentUser={{id: '10'}} />, document.getElementById('fb-messenger'));
+            var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{userID: '1'}} currentUser={{userID: '10'}} />, document.getElementById('fb-messenger'));
             var callouts = ReactTestUtils.scryRenderedDOMComponentsWithClass(messageItem, "callout");
             expect(ReactDom.findDOMNode(callouts[0]).innerHTML).toMatch('hello');
         });
@@ -249,7 +248,7 @@ describe("fb-messenger", () => {
         it("should show the message body if attachments is empty",() => {
             var attachments = new Array<any>();
             var message = {'senderID': '1' ,'messageID':'1','body': 'hello', attachments: attachments};
-            var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{id: '1'}} currentUser={{id: '10'}} />, document.getElementById('fb-messenger'));
+            var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{userID: '1'}} currentUser={{userID: '10'}} />, document.getElementById('fb-messenger'));
             var callouts = ReactTestUtils.scryRenderedDOMComponentsWithClass(messageItem, "callout");
             expect(ReactDom.findDOMNode(callouts[0]).innerHTML).toMatch('hello');
         });
@@ -257,14 +256,14 @@ describe("fb-messenger", () => {
         it("should show the message sticker if there is one",() => {
             var attachments = new Array<any>({type:"sticker",url: "http://sticker.com/sticker.jpg"});
             var message = {'senderID': '1' ,'messageID':'1','body': '', attachments: attachments};
-            var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{id: '1'}} currentUser={{id: '10'}} />, document.getElementById('fb-messenger'));
+            var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{userID: '1'}} currentUser={{userID: '10'}} />, document.getElementById('fb-messenger'));
             var sticker = ReactTestUtils.scryRenderedDOMComponentsWithTag(messageItem, "img");
             expect(sticker.length).toBe(1);
         });
         
         it("should show the emoji icon for emoticons",() => {
             var message = {'senderID': '1' ,'messageID':'1','body': 'Hello world <3'};
-            var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{id: '1'}} currentUser={{id: '10'}} />, document.getElementById('fb-messenger'));
+            var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{userID: '1'}} currentUser={{userID: '10'}} />, document.getElementById('fb-messenger'));
             var emoji = ReactTestUtils.scryRenderedDOMComponentsWithClass(messageItem, "em");
             expect(emoji.length).toBe(1);
             expect(ReactDom.findDOMNode(emoji[0]).className).toBe('em emj186');
@@ -272,7 +271,7 @@ describe("fb-messenger", () => {
         
         it("should show the emoji icon for unicode emoji",() => {
             var message = {'senderID': '1' ,'messageID':'1','body': 'Hello world ❤'};
-            var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{id: '1'}} currentUser={{id: '10'}} />, document.getElementById('fb-messenger'));
+            var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{userID: '1'}} currentUser={{userID: '10'}} />, document.getElementById('fb-messenger'));
             var emoji = ReactTestUtils.scryRenderedDOMComponentsWithClass(messageItem, "em");
             expect(emoji.length).toBe(1);
             expect(ReactDom.findDOMNode(emoji[0]).className).toBe('em emj186');

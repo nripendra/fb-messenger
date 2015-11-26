@@ -34,5 +34,8 @@ export default {
     },
     updateFeedDownloaded() {
         dispatcher.dispatch("updateFeedDownloaded");
+    },
+    restart() {
+        dispatcher.dispatch("restart");
     }
 };

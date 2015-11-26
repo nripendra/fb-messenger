@@ -62,14 +62,14 @@ export default class MessageItem extends React.Component<MessageItemProps, any> 
 		var className = '';
 		var justifyContent = '';
 		
-		if(threadID == currentUser.id) {
+		if(threadID == currentUser.userID) {
 			className = 'callout right';
 			justifyContent = 'flex-end';
-			rightAvatar = <div style={rightAvatarStyle}><Avatar size={32} src={currentUser.thumbSrc} /></div>;
+			rightAvatar = <div style={rightAvatarStyle}><Avatar size={32} src={currentUser.profilePicture} /></div>;
 		} else {
 			className = 'callout left';
 			justifyContent = 'flex-start';
-			leftAvatar = <div style={leftAvatarStyle}><Avatar size={32} src={currentFriend.thumbSrc} /></div>;
+			leftAvatar = <div style={leftAvatarStyle}><Avatar size={32} src={currentFriend.profilePicture} /></div>;
 		}
 		
 		return (<Hbox style={{'justifyContent':justifyContent}}>

@@ -8,15 +8,16 @@ export default class ChatStore extends Store {
     currentUserId: string;
     currentChatThread: string;
     error: any;
-    friendList: { [id: string] : any; };//Dictionary<string, any>;
+    friendList: any[];
     messages: { [chatThreadId: string]: Array<any> };//Dictionary<string, Array<any>>
     currentFriend: any;
+    currentUser: any;
     
     constructor(){
         super();
-        this.friendList = {};
+        this.friendList = [];
         this.messages = {};
-        this.currentFriend = {id: ''};
+        this.currentFriend = {userID: ''};
     }
     
     get actions() {
@@ -32,10 +33,13 @@ export default class ChatStore extends Store {
         this.api = api;
         this.chatService = new ChatService(api);
         this.currentUserId = this.chatService.currentUserId;
-
-        this.chatService.getFriendList().then(function(data: Array<any>) {
-            this.friendList = data
-            this.currentFriend = this.friendList[Object.keys(this.friendList)[0]];
+        
+        var p1 = this.chatService.getCurrentUserInfo();
+        var p2 = this.chatService.getFriendList();
+        
+        Promise.all([p1, p2]).then(function(data: Array<any>){
+            this.currentUser = data[0];
+            this.friendList = data[1] as any[];
             this.emit('change');
             this.listen();
         }.bind(this)).catch(function(err: any) {
@@ -70,6 +74,7 @@ export default class ChatStore extends Store {
     }
 
     listen() {
+        console.log("listening to events...");
         this.chatService.listen();
 
         this.chatService.listener.on('error', function(error: any, stopListening: Function) {
@@ -113,18 +118,12 @@ syscall: "connect"
         }.bind(this));
 
         this.chatService.listener.on('presence', function(event: any, stopListening: Function) {
-            var user = this.friendList[event.userID]; 
-            if(user){
-                user.presence = event;
-                this.emit('change');
-                console.log(user);
-            } else {
-                if((event.statuses || {status: 'offline'}).status == "active") {
-                    //getuser info and add to the friendlist
-                    console.log(event);
-                }
+            for(let user in this.friendList) {
+               if(user.userID == event.userID){
+                    user.presence.status = event.statuses.status;
+                    break;
+               }  
             }
-            
         }.bind(this));
     }
 }

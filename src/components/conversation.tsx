@@ -87,7 +87,7 @@ export default class Conversation extends React.Component<ConversationProps, any
             }
         };
 
-        var currentFriend = this.props.currentFriend;
+        var currentFriend = this.props.currentFriend || {userID: ""};
         var currentUser = this.props.currentUser;
         var messages = this.props.messages;
 
@@ -112,6 +112,6 @@ export default class Conversation extends React.Component<ConversationProps, any
     }
 
     renderHeader(currentFriend: any) {
-        return (<CardHeader title={currentFriend.name} avatar={<Avatar size={32} src={currentFriend.thumbSrc} />} />);
+        return (<CardHeader title={currentFriend.fullName} avatar={<Avatar size={32} src={currentFriend.profilePicture} />} />);
     }
 }
