@@ -1,4 +1,5 @@
 import * as React from "react";
+import {Hbox} from "./layout";
 const Avatar = require("material-ui/lib/avatar");
 
 export class TypingIndicatorProps {
@@ -13,16 +14,17 @@ export default class TypingIndicator extends React.Component<TypingIndicatorProp
 
 	render() {
 		var currentFriend = this.props.currentFriend;
+		var justifyContent = 'flex-start';
 		if (currentFriend.isTyping === true) {
 			return (
-				<div>
+				<Hbox style={{'justifyContent': justifyContent}}>
 					<Avatar size={32} src={currentFriend.profilePicture} />
 					<div className={"typing-indicator"}>
 						<span></span>
 						<span></span>
 						<span></span>
 					</div>
-				</div>);
+				</Hbox>);
 		} else {
 			return <span />;
 		}
