@@ -12,6 +12,7 @@ import LoginActions from '../../src/actions/loginactions';
 import LoginService from '../../src/services/loginservice';
 import ChatStore from '../../src/stores/chatstore';
 import ChatActions from '../../src/actions/chatactions';
+import SendMessageTextField from "../../src/components/send-message-text-field";
 import TypingIndicator from '../../src/components/typing-indicator';
 
 const TextField = require("material-ui/lib/text-field");
@@ -408,6 +409,33 @@ describe("fb-messenger", () => {
                     return;
                 }
             };
+        });
+    });
+    
+    describe("Send text message", ()=>{
+        it("should send the typed message when send button is clicked", () => {
+            var api = {
+                getCurrentUserID: ()=> { return 10;},
+                markAsRead: ()=> {return;},
+                getFriendsList: ()=> {return;},
+                setOptions: ()=> {return;},
+                getOnlineUsers: ()=> {return;},
+                sendMessage: ()=>{return}
+            };
+            AppStores.chatStore.loadFriendList(api);
+
+           spyOn(api, "sendMessage").and.callFake(function() {
+                return;// noop
+           });
+           var sendMessageTextField = ReactDom.render(<SendMessageTextField 
+                                                            currentFriend={{userID: '1', profilePicture: 'http://propic1.com/'}} 
+                                                            currentUser={{userID:'10'}}
+                                                            onTextFieldFocus={()=>{}}
+                                                            onTextFieldBlur={()=>{}} />, 
+                                                            document.getElementById('fb-messenger'));
+           sendMessageTextField.handleSendMessage();
+           
+           expect(api.sendMessage).toHaveBeenCalled();
         });
     });
     
