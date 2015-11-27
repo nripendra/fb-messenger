@@ -19,14 +19,21 @@ export class SendMessageTextFieldProps {
 	onTextFieldBlur: Function;
 }
 
-export default class SendMessageTextField extends React.Component<SendMessageTextField, any> {
-	constructor(props: SendMessageTextFieldProps){
+export default class SendMessageTextField extends React.Component<SendMessageTextFieldProps, any> {
+	constructor(props: SendMessageTextFieldProps) {
         super();
         this.props = props;
+		this.handleSendMessage = this.handleSendMessage.bind(this);
     }
-	
-	render(){
-		return (<Hbox style={{margin:0, padding:0}}>
+
+	handleSendMessage() {
+		let threadID = this.props.currentFriend.userID;
+		let message = { body: (this.refs["messageField"] as any).getValue() };
+		ChatActions.sendMessage(threadID, message)
+	}
+
+	render() {
+		return (<Hbox style={{ margin: 0, padding: 0 }}>
 					<TextField
 						ref="messageField"
 						onFocus={this.props.onTextFieldFocus}
@@ -35,8 +42,8 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
 						multiLine={true}
 						rows={1}
 						rowsMax={2}
-						style={{flex:2}}></TextField>
-					<IconButton><FontIcon className="fa fa-paper-plane fa-2" /></IconButton>
-				</Hbox>);
+						style={{ flex: 2 }}></TextField>
+					<IconButton onClick={this.handleSendMessage} ><FontIcon className="fa fa-paper-plane fa-2" /></IconButton>
+			</Hbox>);
 	}
 }
