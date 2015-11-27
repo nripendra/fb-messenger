@@ -10,8 +10,25 @@
         BrowserWindow = require('browser-window');
 
     require('crash-reporter').start();
+    var facebookChatApiPackageInfo = require("./node_modules/facebook-chat-api/package.json");
 
     var mainWindow:any = null;
+    var showAboutDialog = function() {
+        var versions = process.versions;
+        var appVersion = app.getVersion();
+        const dialog = require('electron').dialog;
+        dialog.showMessageBox(mainWindow, {
+            type : "info",
+            buttons : ["Ok"],
+            title: "About fb-messenger",
+            message : "fb-messenger",
+            detail : "Version: " + appVersion + 
+                     "\n\nShell: " + versions["electron"] + 
+                     "\nRenderer: " + versions["chrome"] + 
+                     "\nNode.js: " + versions["node"] +
+                     "\nfacebook-chat-api: " + facebookChatApiPackageInfo.version
+        });
+    }
 
     app.on('window-all-closed', function () {
         if (process.platform !== 'darwin') {
@@ -155,6 +172,11 @@
                     click: function () {
                         require('shell').openExternal('https://github.com/atom/electron/issues')
                     }
+                }, {
+                    label: 'About',
+                    click: function () {
+                        showAboutDialog();
+                    }
                 }]
             }];
 
@@ -213,6 +235,11 @@
                     label: 'Search Issues',
                     click: function () {
                         require('shell').openExternal('https://github.com/atom/electron/issues')
+                    }
+                }, {
+                    label: 'About',
+                    click: function () {
+                        showAboutDialog();
                     }
                 }]
             }];

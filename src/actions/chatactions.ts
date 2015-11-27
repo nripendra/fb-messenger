@@ -17,5 +17,13 @@ export default {
     sendMessage(threadID: string, message: any) {
         console.log("chatAction: sendMessage : %s, %o", threadID, message);
         dispatcher.dispatch("sendMessage", {threadID, message});
+    },
+    sendTypingIndicator(threadID: string) {
+        console.log("chatAction: sendTypingIndicator : %so", threadID);
+        dispatcher.dispatch("sendTypingIndicator", threadID);
+    },
+    endTypingIndicator(threadID: string) {
+        console.log("chatAction: endTypingIndicator : %so", threadID);
+        dispatcher.dispatch("endTypingIndicator", threadID);
     }
 };
