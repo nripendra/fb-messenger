@@ -29,9 +29,10 @@ export default class Chat extends React.Component<ChatProps, any> {
         var currentFriend = AppStores.chatStore.currentFriend;
         var currentUser = AppStores.chatStore.currentUser;
         var messages = AppStores.chatStore.messages[currentFriend ? currentFriend.userID : ""] || [];
+        var friendListFilterText = AppStores.chatStore.friendListFilterText;
         return (<Hbox>
                   <Vbox>
-                    <FriendList friendList={friendList} currentFriend={currentFriend} />
+                    <FriendList friendList={friendList} currentFriend={currentFriend} friendListFilterText={friendListFilterText} />
                   </Vbox>
                   <Conversation messages={messages} currentUser={currentUser} currentFriend={currentFriend} />
             </Hbox>);
