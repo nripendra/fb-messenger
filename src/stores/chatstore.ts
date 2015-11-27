@@ -25,7 +25,8 @@ export default class ChatStore extends Store {
             'initApi': 'loadFriendList',
             'setCurrentChatThread': 'setCurrentChatThread',
             'friendSelected': 'friendSelected',
-            "markAsRead": "markAsRead"
+            "markAsRead": "markAsRead",
+            "sendMessage": "sendMessage"
         };
     }
 

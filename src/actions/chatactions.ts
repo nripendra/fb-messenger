@@ -13,5 +13,8 @@ export default {
     },
     markAsRead(threadID: string) {
         dispatcher.dispatch("markAsRead", threadID);
+    },
+    sendMessage(threadID: string, message: any) {
+        dispatcher.dispatch("sendMessage", threadID, message);
     }
 };
