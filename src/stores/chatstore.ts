@@ -12,12 +12,16 @@ export default class ChatStore extends Store {
     messages: { [chatThreadId: string]: Array<any> };//Dictionary<string, Array<any>>
     currentFriend: any;
     currentUser: any;
+    typingTimers: { [chatThreadId: string]: any };
+    typingEnders: { [chatThreadId: string]: Function };
 
     constructor() {
         super();
         this.friendList = [];
         this.messages = {};
         this.currentFriend = { userID: '' };
+        this.typingEnders = {};
+        this.typingTimers = {};
     }
 
     get actions() {
@@ -26,7 +30,9 @@ export default class ChatStore extends Store {
             'setCurrentChatThread': 'setCurrentChatThread',
             'friendSelected': 'friendSelected',
             "markAsRead": "markAsRead",
-            "sendMessage": "sendMessage"
+            "sendMessage": "sendMessage",
+            "sendTypingIndicator": "sendTypingIndicator",
+            "endTypingIndicator": "endTypingIndicator"
         };
     }
 
@@ -131,6 +137,29 @@ export default class ChatStore extends Store {
         this.messages[threadID].push(message);
     }
 
+    sendTypingIndicator(threadID: string) {
+        var timer = this.typingTimers[threadID] || null;
+        if(timer === null) {
+            this.chatService.sendTypingIndicator(threadID).then((end: Function) => {
+                this.typingEnders[threadID] = end;
+                this.typingTimers[threadID] = setTimeout(function(){
+                    this.typingTimers[threadID] = null;
+                    this.endTypingIndicator(threadID);
+                }, 30000);
+            }).catch(() => {
+                this.typingTimers[threadID] = null;
+            });
+        }
+    }
+    
+    endTypingIndicator(threadID: string) {
+        var end = this.typingEnders[threadID] || null;
+        if(end !== null) {
+            end();
+            this.typingEnders[threadID] = null;
+        }
+    }
+    
     listen() {
         console.log("listening to events...");
         this.chatService.listen();
