@@ -28,8 +28,9 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
 
 	handleSendMessage() {
 		let threadID = this.props.currentFriend.userID;
-		let message = { body: (this.refs["messageField"] as any).getValue() };
-		ChatActions.sendMessage(threadID, message)
+		let message = { senderID: this.props.currentUser.userID, body: (this.refs["messageField"] as any).getValue() };
+		ChatActions.sendMessage(threadID, message);
+		(this.refs["messageField"] as any).clearValue();
 	}
 
 	render() {
