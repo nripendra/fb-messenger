@@ -416,6 +416,7 @@ describe("fb-messenger", () => {
         it("should send the typed message when send button is clicked", () => {
             var api = {
                 getCurrentUserID: ()=> { return 10;},
+                getUserInfo: ()=> { return 10;},
                 markAsRead: ()=> {return;},
                 getFriendsList: ()=> {return;},
                 setOptions: ()=> {return;},
@@ -436,6 +437,62 @@ describe("fb-messenger", () => {
            sendMessageTextField.handleSendMessage();
            
            expect(api.sendMessage).toHaveBeenCalled();
+        });
+        
+        it("should send the typing indicator when text is changed", () => {
+            var api = {
+                getCurrentUserID: ()=> { return 10;},
+                getUserInfo: ()=> { return 10;},
+                markAsRead: ()=> {return;},
+                getFriendsList: ()=> {return;},
+                setOptions: ()=> {return;},
+                getOnlineUsers: ()=> {return;},
+                sendMessage: ()=>{return;},
+                sendTypingIndicator: ()=>{return;}
+            };
+            AppStores.chatStore.loadFriendList(api);
+
+           spyOn(api, "sendTypingIndicator").and.callFake(function() {
+                return;// noop
+           });
+           var sendMessageTextField = ReactDom.render(<SendMessageTextField 
+                                                            currentFriend={{userID: '1', profilePicture: 'http://propic1.com/'}} 
+                                                            currentUser={{userID:'10'}}
+                                                            onTextFieldFocus={()=>{}}
+                                                            onTextFieldBlur={()=>{}} />, 
+                                                            document.getElementById('fb-messenger'));
+           (sendMessageTextField.refs["messageField"] as any).setValue("typing..");
+           sendMessageTextField.handleTextChange();
+           
+           expect(api.sendTypingIndicator).toHaveBeenCalled();
+        });
+        
+        it("should end the typing indicator when text is empty", () => {
+            var api = {
+                getCurrentUserID: ()=> { return 10;},
+                getUserInfo: ()=> { return 10;},
+                markAsRead: ()=> {return;},
+                getFriendsList: ()=> {return;},
+                setOptions: ()=> {return;},
+                getOnlineUsers: ()=> {return;},
+                sendMessage: ()=>{return;},
+                sendTypingIndicator: ()=>{return;}
+            };
+           AppStores.chatStore.loadFriendList(api);
+
+           spyOn(ChatActions, "endTypingIndicator").and.callFake(function() {
+                return;// noop
+           });
+           var sendMessageTextField = ReactDom.render(<SendMessageTextField 
+                                                            currentFriend={{userID: '1', profilePicture: 'http://propic1.com/'}} 
+                                                            currentUser={{userID:'10'}}
+                                                            onTextFieldFocus={()=>{}}
+                                                            onTextFieldBlur={()=>{}} />, 
+                                                            document.getElementById('fb-messenger'));
+           (sendMessageTextField.refs["messageField"] as any).setValue("");
+           sendMessageTextField.handleTextChange();
+           
+           expect(ChatActions.endTypingIndicator).toHaveBeenCalled();
         });
     });
     
