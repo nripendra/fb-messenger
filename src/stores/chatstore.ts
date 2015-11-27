@@ -74,17 +74,35 @@ export default class ChatStore extends Store {
     }
 
     localGUID = 0;
-    sendMessage(threadID: string, message: any) {
-        ((threadID: string, message: any) => {
-            message.messageID = "sending-inprogress-" + (this.localGUID++);
-            this.addMessage(threadID, message);
-            console.log("sending message %o to %s", message, threadID);
-            this.chatService.sendMessage(message, threadID).then((returnMessage) => {
+    sendMessage(payload: any) {
+        var {threadID, message} = payload;
+        console.log("ChatStore: sendMessage: %o to %s", message, threadID);
+        (function(threadID: string, msg: any) {
+            msg.messageID = "sending-inprogress-" + (this.localGUID++);
+            this.addMessage(threadID, msg);
+            console.log("sending message %o to %s", msg, threadID);
+            this.chatService.sendMessage(msg, threadID).then((returnMessage: any) => {
                 console.log("message sent: %o, %s", returnMessage, threadID);
-                message.messageID = returnMessage.messageID;
+                msg.messageID = returnMessage.messageID;
             });
             this.emit("change");
-        })(threadID, message);
+        }.bind(this))(threadID, message);
+    }
+    
+    transferMessageProps(dest:any, source:any) {
+        dest.senderName = source.senderName;
+        dest.senderID = source.senderID;
+        dest.participantNames = source.participantNames;
+        dest.participantIDs = source.participantIDs;
+        dest.threadID = source.threadID;
+        dest.threadName = source.threadName;
+        dest.location = source.location;
+        dest.messageID = source.messageID;
+        dest.attachments = source.attachments;
+        dest.timestamp = source.timestamp;
+        dest.timestampAbsolute = source.timestampAbsolute;
+        dest.timestampRelative = source.timestampRelative;
+        dest.timestampDatetime = source.timestampDatetime;
     }
 
     addMessage(threadID: string, message: any) {
@@ -95,16 +113,18 @@ export default class ChatStore extends Store {
         if(senderID === this.currentUser.userID) {
             console.log("Received back own message %o, %s", message, threadID);
             let messages = this.messages[threadID];
-            for(let msg in messages) {
+            for(let msg of messages) {
                 // todo: check attachments too.
                 if((/^sending-inprogress-\d+$/).test(msg.messageID) && msg.body == message.body) {
                     // case sentMessage callback comes second to listen event.
+                    this.transferMessageProps(msg, message);
                     console.log("Message in progress received %o, %s", message, threadID);
-                    msg.messageID = message.messageID;
                     return;
                 } else if(msg.messageID == message.messageID) {
                     // case sentMessage callback comes before listen event.
+                    this.transferMessageProps(msg, message);
                     console.log("Message is already tracked: %o, %s", message, threadID);
+                    return;
                 }
             }
         } 
@@ -139,7 +159,7 @@ syscall: "connect"
                 threadID = (event.threadID || "").toString();
             }
 
-            console.log("message received: %o", event);
+            console.log("listen: message received: %o", event);
             this.addMessage(threadID, event);
             this.emit('change');
         }.bind(this));
@@ -152,7 +172,7 @@ syscall: "connect"
             if (this.currentFriend && this.currentFriend.userID == event.from) {
                 this.currentFriend.isTyping = event.isTyping;
                 this.emit('change');
-                console.log("%s %s: %o", this.currentFriend.fullName, this.currentFriend.isTyping? "is typing..." : "stopped typing", event);
+                console.log("listen: %s %s: %o", this.currentFriend.fullName, this.currentFriend.isTyping? "is typing..." : "stopped typing", event);
             }
         }.bind(this));
 
