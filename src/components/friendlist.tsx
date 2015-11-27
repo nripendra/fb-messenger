@@ -1,9 +1,8 @@
 import * as React from 'react';
 import {Hbox, Vbox} from './layout';
 import ChatAction from '../actions/chatactions';
-import AppStores from '../appstores';
 import SearchField from "./search-field"
-import stringScore from "../services/string-score"
+import sortAndFilterFriendList from "../decorators/sortAndFilterFriendList";
 
 const Popover = require('./popover');
 const Avatar = require('material-ui/lib/avatar');
@@ -38,6 +37,7 @@ export class FriendListProps {
     friendListFilterText: string;
 }
 
+@sortAndFilterFriendList
 export default class FriendList extends React.Component<FriendListProps, any> {
     constructor(props: FriendListProps) {
         super();
@@ -47,119 +47,100 @@ export default class FriendList extends React.Component<FriendListProps, any> {
     friendClicked(friend: any, event: any) {
         ChatAction.friendSelected(friend);
     }
-    
-    componentDidUpdate () {
-        var needsUpdate = ((this.props.currentFriend || {userID: ""}).userID == "") && (this.props.friendList || []).length > 0;
-        if(needsUpdate){
+
+    componentDidUpdate() {
+        var needsUpdate = ((this.props.currentFriend || { userID: "" }).userID == "") && (this.props.friendList || []).length > 0;
+        if (needsUpdate) {
             var currentFriend = this.props.friendList[0];
             ChatAction.friendSelected(currentFriend);
         }
     }
 
     render() {
-        var state = {
-            'active': {
-                position: 'absolute',
-                bottom: 2,
-                right: 0,
-                border: '1px solid green',
-                display: 'inline-block',
-                width: 10,
-                height: 10,
-                borderRadius: '50%',
-                backgroundColor: 'green'
-            },
-            'offline': {
-                position: 'absolute',
-                bottom: 2,
-                right: 0,
-                border: '1px solid gray',
-                display: 'inline-block',
-                width: 10,
-                height: 10,
-                borderRadius: '50%',
-                backgroundColor: 'gray'
-            },
-            'idle': {
-                position: 'absolute',
-                bottom: 2,
-                right: 0,
-                border: '1px solid yellow',
-                display: 'inline-block',
-                width: 10,
-                height: 10,
-                borderRadius: '50%',
-                backgroundColor: 'yellow'
-            },
-            'invisible': {
-                position: 'absolute',
-                bottom: 2,
-                right: 0,
-                border: '1px solid gray',
-                display: 'inline-block',
-                width: 10,
-                height: 10,
-                borderRadius: '50%',
-                backgroundColor: 'gray'
-            },
-            'selected': {
-                backgroundColor: '#6d84b4'
-            }
-        };
-
         var friendlistStyle = {
             'overflow': 'auto',
             'paddingTop': 0,
             'maxHeight': 'calc(100vh - 63px)'
         };
 
-        var friendListFilterText: string = this.props.friendListFilterText || "";
-        var checkScore: boolean = friendListFilterText.trim().length > 0
-        var _self = this;
-        var friendList = (this.props.friendList || []).sort((x, y) => {
-            x.searchScore = 0;
-            y.searchScore = 0;
-            if(friendListFilterText !== "") {
-                var xScore = stringScore(x.fullName, friendListFilterText);
-                var yScore = stringScore(y.fullName, friendListFilterText);
-                
-                x.searchScore = xScore;
-                y.searchScore = yScore;
-                
-                var diff = yScore - xScore;
-                return diff;
-            }
-            var xMessage: any = (AppStores.chatStore.messages[x.userID] || []);
-            var yMessage: any = (AppStores.chatStore.messages[y.userID] || []);
-            if (xMessage.length > 0) {
-                xMessage = xMessage[xMessage.length - 1];
-            } else {
-                xMessage = { timestamp: 0 };
-            }
-
-            if (yMessage.length > 0) {
-                yMessage = yMessage[yMessage.length - 1];
-            } else {
-                yMessage = { timestamp: 0 };
-            }
-
-            var diff = yMessage.timestamp - xMessage.timestamp;
-            if (diff == 0) {
-                var presencePriority = { 'active': 3, 'idle': 2, 'invisible': 1, 'offline': 0 };
-                var presence1 = (presencePriority[x.presence.status]) || 0;
-                var presence2 = (presencePriority[y.presence.status]) || 0;
-                if (presence1 == presence2) {
-                    return (x.firstName).localeCompare(y.firstName);
-                } else {
-                    return presence2 - presence1;
-                }
-            }
-            return diff;
-        }).filter(x => x.isFriend === true && (checkScore === false || x.searchScore > 0.35));
-        
         let leftPane = { 'height': 'calc(100vh - 8px)', 'maxHeight': 'calc(100vh - 8px)' };
         return (<div style={leftPane}>
-                 <Toolbar>
+                 {this.renderToolbar() }
+                 <ListDivider />
+                 <List style={friendlistStyle}>
+                    { this.props.friendList.map((friend: any) => this.renderListItem(friend)) }
+                 </List>
+            </div>);
+    }
+
+    state: any = {
+        'active': {
+            position: 'absolute',
+            bottom: 2,
+            right: 0,
+            border: '1px solid green',
+            display: 'inline-block',
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            backgroundColor: 'green'
+        },
+        'offline': {
+            position: 'absolute',
+            bottom: 2,
+            right: 0,
+            border: '1px solid gray',
+            display: 'inline-block',
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            backgroundColor: 'gray'
+        },
+        'idle': {
+            position: 'absolute',
+            bottom: 2,
+            right: 0,
+            border: '1px solid yellow',
+            display: 'inline-block',
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            backgroundColor: 'yellow'
+        },
+        'invisible': {
+            position: 'absolute',
+            bottom: 2,
+            right: 0,
+            border: '1px solid gray',
+            display: 'inline-block',
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            backgroundColor: 'gray'
+        },
+        'selected': {
+            backgroundColor: '#6d84b4'
+        }
+    };
+
+    renderListItem(friend: any) {
+        var currentFriend = (this.props.currentFriend || { userID: '' });
+        var isCurrentFriend = friend.userID == currentFriend.userID;
+        var style = isCurrentFriend ? this.state.selected : {};
+        var presence = friend.presence.status;
+        return (<ListItem
+            key={friend.userID}
+            leftAvatar={<div><Avatar  size={32} src={friend.profilePicture} />
+                                           <span style={this.state[presence || 'offline']}></span>
+                </div>}
+            style={style}
+            onClick={this.friendClicked.bind(this, friend) }
+            primaryText={friend.fullName}>
+            </ListItem>);
+    }
+
+    renderToolbar() {
+        return (<Toolbar>
                     <ToolbarGroup key={0} float="left">
                         <SearchField />
                         </ToolbarGroup>
@@ -167,8 +148,7 @@ export default class FriendList extends React.Component<FriendListProps, any> {
                         <ToolbarSeparator/>
                         <Popover listStyle={{ background: '#C7C3C3', left: 'calc(50% - 10.2em)' }}
                             iconButtonElement={<IconButton><FontIcon className="fa fa-bell notification" /></IconButton>}
-                            openDirection='bottom-right'
-                            >
+                            openDirection='bottom-right'>
                              <ListItem
                                  leftAvatar={<Avatar>F</Avatar>}
                                  primaryText="Brendan Lim"
@@ -180,23 +160,6 @@ export default class FriendList extends React.Component<FriendListProps, any> {
                             </Popover>
                         <IconButton><FontIcon className="fa fa-sign-out" /></IconButton>
                         </ToolbarGroup>
-                     </Toolbar>
-                <ListDivider />
-                <List style={friendlistStyle}>
-                  {friendList.map(function(friend: any) {
-                      var currentFriend = (_self.props.currentFriend || { userID: '' });
-                      var isCurrentFriend = friend.userID == currentFriend.userID;
-                      var style = isCurrentFriend ? state.selected : {};
-                      var presence = friend.presence.status;
-                      return (<ListItem
-                          key={friend.userID}
-                          leftAvatar={<div><Avatar  size={32} src={friend.profilePicture} /><span style={state[presence || 'offline']}></span></div>}
-                          style={style}
-                          onClick={_self.friendClicked.bind(_self, friend) }
-                          primaryText={friend.fullName}>
-                          </ListItem>);
-                  }) }
-                    </List>
-            </div>);
+            </Toolbar>);
     }
 }

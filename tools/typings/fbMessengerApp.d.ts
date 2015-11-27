@@ -44,6 +44,8 @@
 
 /// <reference path="../../src/decorators/connectToStores.tsx" />
 
+/// <reference path="../../src/decorators/sortAndFilterFriendList.tsx" />
+
 /// <reference path="../../src/services/auto-updateservice.ts" />
 
 /// <reference path="../../src/services/chatservice.ts" />
