@@ -13,5 +13,9 @@ export default {
     },
     markAsRead(threadID: string) {
         dispatcher.dispatch("markAsRead", threadID);
+    },
+    sendMessage(threadID: string, message: any) {
+        console.log("chatAction: sendMessage : %s, %o", threadID, message);
+        dispatcher.dispatch("sendMessage", {threadID, message});
     }
 };

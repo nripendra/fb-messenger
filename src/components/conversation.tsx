@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {Hbox, Vbox} from './layout';
 import ConversationHistory from './conversation-history';
+import SendMessageTextField from './send-message-text-field';
 import ChatActions from "../actions/chatactions";
 
 const Avatar = require('material-ui/lib/avatar');
@@ -18,17 +19,17 @@ const CardMedia = Cards.CardMedia;
 export class ConversationProps {
     messages: any;
     currentFriend: any;
-	currentUser: any;
+    currentUser: any;
 }
 
 export default class Conversation extends React.Component<ConversationProps, any> {
     electronRequire: Function;
-    isFocused:boolean;
+    isFocused: boolean;
 
     constructor(props: ConversationProps) {
         super();
         this.props = props;
-        this.electronRequire = (global as any).electronRequire || function () {return;};
+        this.electronRequire = (global as any).electronRequire || function() { return; };
         this.handleTextFieldFocus = this.handleTextFieldFocus.bind(this);
         this.handleTextFieldBlur = this.handleTextFieldBlur.bind(this);
         this.hasUnreadMessage = this.hasUnreadMessage.bind(this);
@@ -48,16 +49,16 @@ export default class Conversation extends React.Component<ConversationProps, any
         this.markAsReadIfNeeded();
     }
 
-    componentDidUpdate(prevProps:any, prevState:any) {
+    componentDidUpdate(prevProps: any, prevState: any) {
         this.markAsReadIfNeeded();
     }
 
     markAsReadIfNeeded() {
         let messages = this.props.messages || [];
-        if(messages.length > 0) {
+        if (messages.length > 0) {
             let remote = this.electronRequire("remote");
             let currentWindow = remote.getCurrentWindow();
-            if(this.isFocused && currentWindow.isFocused() && this.hasUnreadMessage()) {
+            if (this.isFocused && currentWindow.isFocused() && this.hasUnreadMessage()) {
                 console.log("marking as read");
                 let currentFriend = this.props.currentFriend;
                 ChatActions.markAsRead(currentFriend.userID);
@@ -70,8 +71,8 @@ export default class Conversation extends React.Component<ConversationProps, any
         var currentUser = this.props.currentUser;
         var needMarking: boolean = false;
         messages.forEach((m: any) => {
-            if((m.isSeen || false) === false && m.senderID !== currentUser.userID) {
-               needMarking = true;
+            if ((m.isSeen || false) === false && m.senderID !== currentUser.userID) {
+                needMarking = true;
             }
             m.isSeen = true;
         });
@@ -87,28 +88,21 @@ export default class Conversation extends React.Component<ConversationProps, any
             }
         };
 
-        var currentFriend = this.props.currentFriend || {userID: ""};
+        var currentFriend = this.props.currentFriend || { userID: "" };
         var currentUser = this.props.currentUser;
         var messages = this.props.messages;
 
         return (<Card style={styles.rightPane}>
-                    {this.renderHeader(currentFriend)}
+                    {this.renderHeader(currentFriend) }
                     <ConversationHistory messages={messages} currentUser={currentUser} currentFriend={currentFriend} />
-                    <CardActions style={{borderTop:"2px solid #CCC", padding:0}}>
-                        <Hbox style={{margin:0, padding:0}}>
-                            <TextField
-                                ref="messageField"
-                                onFocus={this.handleTextFieldFocus}
-                                onBlur={this.handleTextFieldBlur}
-                                hintText="Write a message..."
-                                multiLine={true}
-                                rows={1}
-                                rowsMax={2}
-                                style={{flex:2}}></TextField>
-                            <IconButton><FontIcon className="fa fa-paper-plane fa-2" /></IconButton>
-                        </Hbox>
+                    <CardActions style={{ borderTop: "2px solid #CCC", padding: 0 }}>
+                        <SendMessageTextField currentFriend={currentFriend}
+                            currentUser={currentUser}
+                            onTextFieldFocus = {this.handleTextFieldFocus}
+                            onTextFieldBlur = {this.handleTextFieldBlur}
+                        />
                     </CardActions>
-                  </Card>);
+            </Card>);
     }
 
     renderHeader(currentFriend: any) {
