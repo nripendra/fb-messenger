@@ -78,6 +78,7 @@ export default class ChatStore extends Store {
         ((threadID: string, message: any) => {
             message.messageID = "sending-inprogress-" + (this.localGUID++);
             this.addMessage(threadID, message);
+            console.log("sending message %o to %s", message, threadID);
             this.chatService.sendMessage(message, threadID).then((returnMessage) => {
                 console.log("message sent: %o", returnMessage);
                 message.messageID = returnMessage.messageID;
@@ -92,9 +93,12 @@ export default class ChatStore extends Store {
         }
         let senderID = (message.senderID || "").toString();
         if(senderID === this.currentUser.userID) {
+            console.log("Received back own message %o, %s", message, threadID);
             let messages = this.messages[threadID];
             for(let msg in messages) {
+                // todo: check attachments too.
                 if((/^sending-inprogress-\d+$/).test(msg.messageID) && msg.body == message.body) {
+                    console.log("Message is already tracked %o, %s", message, threadID);
                     msg.messageID = message.messageID;
                     return;
                 }
