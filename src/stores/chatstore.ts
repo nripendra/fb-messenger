@@ -80,7 +80,7 @@ export default class ChatStore extends Store {
             this.addMessage(threadID, message);
             console.log("sending message %o to %s", message, threadID);
             this.chatService.sendMessage(message, threadID).then((returnMessage) => {
-                console.log("message sent: %o", returnMessage);
+                console.log("message sent: %o, %s", returnMessage, threadID);
                 message.messageID = returnMessage.messageID;
             });
             this.emit("change");
@@ -98,9 +98,13 @@ export default class ChatStore extends Store {
             for(let msg in messages) {
                 // todo: check attachments too.
                 if((/^sending-inprogress-\d+$/).test(msg.messageID) && msg.body == message.body) {
-                    console.log("Message is already tracked %o, %s", message, threadID);
+                    // case sentMessage callback comes second to listen event.
+                    console.log("Message in progress received %o, %s", message, threadID);
                     msg.messageID = message.messageID;
                     return;
+                } else if(msg.messageID == message.messageID) {
+                    // case sentMessage callback comes before listen event.
+                    console.log("Message is already tracked: %o, %s", message, threadID);
                 }
             }
         } 
