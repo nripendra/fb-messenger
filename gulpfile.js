@@ -54,6 +54,7 @@ gulp.task('compile-test', ['copy-jsx-test'], function(){
 
 gulp.task('test', ['compile-test'], function(){
   process.env.NODE_ENV = 'development';
+  global.electronRequire = require;
   return gulp.src('./tests/out/tests/specs/**/*.js')
       .pipe(jasmine({includeStackTrace: true, reporter: new SpecReporter()}));
 });

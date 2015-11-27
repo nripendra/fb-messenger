@@ -4,6 +4,8 @@
 
 /// <reference path="../../src/appstores.ts" />
 
+/// <reference path="../../src/electronRequire.ts" />
+
 /// <reference path="../../src/index.ts" />
 
 /// <reference path="../../src/stdio-redirect.ts" />

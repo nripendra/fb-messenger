@@ -1,8 +1,9 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import electronRequire from "../electronRequire";
 
 
-const debounce =  require ('lodash.debounce');
+const debounce =  electronRequire ('lodash.debounce');
 
 const WindowListenable = require ('material-ui/lib/mixins/window-listenable');
 // const RenderToLayer = require ('material-ui/lib/render-to-layer');

@@ -1,8 +1,9 @@
 import * as React from "react";
 import ChatAction from '../actions/chatactions';
+import electronRequire from "../electronRequire";
 
 const TextField = require('material-ui/lib/text-field');
-const debounce = (global as any).electronRequire("lodash.debounce");
+const debounce = electronRequire("lodash.debounce");
 
 export default class SearchField extends React.Component<any, any> {
 	constructor(props:any) {
