@@ -14,6 +14,7 @@ export default class ChatStore extends Store {
     currentUser: any;
     typingTimers: { [chatThreadId: string]: any };
     typingEnders: { [chatThreadId: string]: Function };
+    friendListFilterText: string;
 
     constructor() {
         super();
@@ -32,7 +33,8 @@ export default class ChatStore extends Store {
             "markAsRead": "markAsRead",
             "sendMessage": "sendMessage",
             "sendTypingIndicator": "sendTypingIndicator",
-            "endTypingIndicator": "endTypingIndicator"
+            "endTypingIndicator": "endTypingIndicator",
+            "filterFriendList": "filterFriendList"
         };
     }
 
@@ -158,6 +160,11 @@ export default class ChatStore extends Store {
             end();
             this.typingEnders[threadID] = null;
         }
+    }
+    
+    filterFriendList(friendListFilterText: string) {
+        this.friendListFilterText = friendListFilterText;
+        this.emit("change");
     }
     
     listen() {
