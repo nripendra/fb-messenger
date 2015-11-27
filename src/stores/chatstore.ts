@@ -12,14 +12,14 @@ export default class ChatStore extends Store {
     messages: { [chatThreadId: string]: Array<any> };//Dictionary<string, Array<any>>
     currentFriend: any;
     currentUser: any;
-    
-    constructor(){
+
+    constructor() {
         super();
         this.friendList = [];
         this.messages = {};
-        this.currentFriend = {userID: ''};
+        this.currentFriend = { userID: '' };
     }
-    
+
     get actions() {
         return {
             'initApi': 'loadFriendList',
@@ -33,11 +33,11 @@ export default class ChatStore extends Store {
         this.api = api;
         this.chatService = new ChatService(api);
         this.currentUserId = this.chatService.currentUserId;
-        
+
         var p1 = this.chatService.getCurrentUserInfo();
         var p2 = this.chatService.getFriendList();
-        
-        Promise.all([p1, p2]).then(function(data: Array<any>){
+
+        Promise.all([p1, p2]).then(function(data: Array<any>) {
             this.currentUser = data[0];
             this.friendList = data[1] as any[];
             this.emit('change');
@@ -48,7 +48,7 @@ export default class ChatStore extends Store {
             this.emit('change');
         }.bind(this));
     }
-    
+
     friendSelected(friend: any) {
         this.currentFriend = friend;
         this.emit('change');
@@ -61,15 +61,45 @@ export default class ChatStore extends Store {
 
     markAsRead(threadID: string, retryCount?: number) {
         retryCount = retryCount || 0;
-        this.chatService.markAsRead(threadID).then(()=> {
+        this.chatService.markAsRead(threadID).then(() => {
             this.emit("change");
         }).catch(((err: any) => {
-             if(retryCount < 3) {
-                setTimeout((function(){
+            if (retryCount < 3) {
+                setTimeout((function() {
                     this.markAsRead(threadID, retryCount++);
                 }).bind(this), 1000);
             }
         }).bind(this));
+    }
+
+    localGUID = 0;
+    sendMessage(threadID: string, message: any) {
+        ((threadID: string, message: any) => {
+            message.messageID = "sending-inprogress-" + (this.localGUID++);
+            this.addMessage(threadID, message);
+            this.chatService.sendMessage(message, threadID).then((returnMessage) => {
+                console.log("message sent: %o", returnMessage);
+                message.messageID = returnMessage.messageID;
+            });
+            this.emit("change");
+        })(threadID, message);
+    }
+
+    addMessage(threadID: string, message: any) {
+        if (!this.messages[threadID]) {
+            this.messages[threadID] = new Array<string>();
+        }
+        let senderID = (message.senderID || "").toString();
+        if(senderID === this.currentUser.userID) {
+            let messages = this.messages[threadID];
+            for(let msg in messages) {
+                if((/^sending-inprogress-\d+$/).test(msg.messageID) && msg.body == message.body) {
+                    msg.messageID = message.messageID;
+                    return;
+                }
+            }
+        } 
+        this.messages[threadID].push(message);
     }
 
     listen() {
@@ -96,36 +126,33 @@ syscall: "connect"
 
         this.chatService.listener.on('message', function(event: any, stopListening: Function) {
             var threadID = (event.senderID || "").toString();
-            if(threadID == this.currentUserId) {
+            if (threadID == this.currentUserId) {
                 threadID = (event.threadID || "").toString();
             }
-            
-            if(!this.messages[threadID]){
-                this.messages[threadID] = new Array<string>();
-            }
-            this.messages[threadID].push(event);
+
+            console.log("message received: %o", event);
+            this.addMessage(threadID, event);
             this.emit('change');
-            console.log(event);
         }.bind(this));
 
         this.chatService.listener.on('event', function(event: any, stopListening: Function) {
             console.log(event);
         }.bind(this));
-        
+
         this.chatService.listener.on('typ', function(event: any, stopListening: Function) {
-            if(this.currentFriend && this.currentFriend.userID == event.from) {
+            if (this.currentFriend && this.currentFriend.userID == event.from) {
                 this.currentFriend.isTyping = event.isTyping;
                 this.emit('change');
+                console.log("%s %s: %o", this.currentFriend.fullName, this.currentFriend.isTyping? "is typing..." : "stopped typing", event);
             }
-            console.log(event);
         }.bind(this));
 
         this.chatService.listener.on('presence', function(event: any, stopListening: Function) {
-            for(let user in this.friendList) {
-               if(user.userID == event.userID){
+            for (let user in this.friendList) {
+                if (user.userID == event.userID) {
                     user.presence.status = event.statuses.status;
                     break;
-               }  
+                }
             }
         }.bind(this));
     }
