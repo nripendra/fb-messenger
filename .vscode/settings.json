@@ -6,5 +6,27 @@
 		"electron/**":true,
 		"out/**": true
 	},
-	"typescript.tsdk": "D:/Projects/Node/fb-messenger/node_modules/typescript/lib"
+	"typescript.tsdk": "D:/Projects/Node/fb-messenger/node_modules/typescript/lib",
+	"startanyshell.shells": [
+		{
+			"description": "ConsoleZ",
+			"command": "start \"%description%\"  \"%HOMEDRIVE%\\ProgramData\\chocolatey\\lib\\ConsoleZ\\tools\\console.exe\""
+		},
+		{
+			"description": "Windows Command Prompt",
+			"command": "start \"%description%\" /WAIT %comspec%"
+		},
+		{
+			"description": "Git Bash 2",
+			"command": "start \"%description%\" %comspec% /C \"%HOMEDRIVE%\Program Files\Git\git-cmd.exe\" --no-cd --command=usr/bin/bash.exe -l -i"
+		},
+		{
+			"description": "Windows Powershell",
+			"command": "start \"%description%\" powershell.exe -noexit"
+		},
+		{
+			"description": "Developer Command Prompt for VS2015",
+			"command": "start \"%description%\" /WAIT \"%HOMEDRIVE%\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\VsDevCmd.bat\""
+		}
+	]
 }

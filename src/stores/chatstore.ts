@@ -12,19 +12,21 @@ export default class ChatStore extends Store {
     messages: { [chatThreadId: string]: Array<any> };//Dictionary<string, Array<any>>
     currentFriend: any;
     currentUser: any;
-    
-    constructor(){
+
+    constructor() {
         super();
         this.friendList = [];
         this.messages = {};
-        this.currentFriend = {userID: ''};
+        this.currentFriend = { userID: '' };
     }
-    
+
     get actions() {
         return {
             'initApi': 'loadFriendList',
             'setCurrentChatThread': 'setCurrentChatThread',
-            'friendSelected': 'friendSelected'
+            'friendSelected': 'friendSelected',
+            "markAsRead": "markAsRead",
+            "sendMessage": "sendMessage"
         };
     }
 
@@ -32,11 +34,11 @@ export default class ChatStore extends Store {
         this.api = api;
         this.chatService = new ChatService(api);
         this.currentUserId = this.chatService.currentUserId;
-        
+
         var p1 = this.chatService.getCurrentUserInfo();
         var p2 = this.chatService.getFriendList();
-        
-        Promise.all([p1, p2]).then(function(data: Array<any>){
+
+        Promise.all([p1, p2]).then(function(data: Array<any>) {
             this.currentUser = data[0];
             this.friendList = data[1] as any[];
             this.emit('change');
@@ -47,7 +49,7 @@ export default class ChatStore extends Store {
             this.emit('change');
         }.bind(this));
     }
-    
+
     friendSelected(friend: any) {
         this.currentFriend = friend;
         this.emit('change');
@@ -56,6 +58,77 @@ export default class ChatStore extends Store {
     setCurrentChatThread(chatThread: string) {
         this.currentChatThread = chatThread;
         this.emit('change');
+    }
+
+    markAsRead(threadID: string, retryCount?: number) {
+        retryCount = retryCount || 0;
+        this.chatService.markAsRead(threadID).then(() => {
+            this.emit("change");
+        }).catch(((err: any) => {
+            if (retryCount < 3) {
+                setTimeout((function() {
+                    this.markAsRead(threadID, retryCount++);
+                }).bind(this), 1000);
+            }
+        }).bind(this));
+    }
+
+    localGUID = 0;
+    sendMessage(payload: any) {
+        var {threadID, message} = payload;
+        console.log("ChatStore: sendMessage: %o to %s", message, threadID);
+        (function(threadID: string, msg: any) {
+            msg.messageID = "sending-inprogress-" + (this.localGUID++);
+            this.addMessage(threadID, msg);
+            console.log("sending message %o to %s", msg, threadID);
+            this.chatService.sendMessage(msg, threadID).then((returnMessage: any) => {
+                console.log("message sent: %o, %s", returnMessage, threadID);
+                msg.messageID = returnMessage.messageID;
+            });
+            this.emit("change");
+        }.bind(this))(threadID, message);
+    }
+    
+    transferMessageProps(dest:any, source:any) {
+        dest.senderName = source.senderName;
+        dest.senderID = source.senderID;
+        dest.participantNames = source.participantNames;
+        dest.participantIDs = source.participantIDs;
+        dest.threadID = source.threadID;
+        dest.threadName = source.threadName;
+        dest.location = source.location;
+        dest.messageID = source.messageID;
+        dest.attachments = source.attachments;
+        dest.timestamp = source.timestamp;
+        dest.timestampAbsolute = source.timestampAbsolute;
+        dest.timestampRelative = source.timestampRelative;
+        dest.timestampDatetime = source.timestampDatetime;
+    }
+
+    addMessage(threadID: string, message: any) {
+        if (!this.messages[threadID]) {
+            this.messages[threadID] = new Array<string>();
+        }
+        let senderID = (message.senderID || "").toString();
+        if(senderID === this.currentUser.userID) {
+            console.log("Received back own message %o, %s", message, threadID);
+            let messages = this.messages[threadID];
+            for(let msg of messages) {
+                // todo: check attachments too.
+                if((/^sending-inprogress-\d+$/).test(msg.messageID) && msg.body == message.body) {
+                    // case sentMessage callback comes second to listen event.
+                    this.transferMessageProps(msg, message);
+                    console.log("Message in progress received %o, %s", message, threadID);
+                    return;
+                } else if(msg.messageID == message.messageID) {
+                    // case sentMessage callback comes before listen event.
+                    this.transferMessageProps(msg, message);
+                    console.log("Message is already tracked: %o, %s", message, threadID);
+                    return;
+                }
+            }
+        } 
+        this.messages[threadID].push(message);
     }
 
     listen() {
@@ -82,32 +155,33 @@ syscall: "connect"
 
         this.chatService.listener.on('message', function(event: any, stopListening: Function) {
             var threadID = (event.senderID || "").toString();
-            if(threadID == this.currentUserId) {
+            if (threadID == this.currentUserId) {
                 threadID = (event.threadID || "").toString();
             }
-            
-            if(!this.messages[threadID]){
-                this.messages[threadID] = new Array<string>();
-            }
-            this.messages[threadID].push(event);
+
+            console.log("listen: message received: %o", event);
+            this.addMessage(threadID, event);
             this.emit('change');
-            console.log(event);
         }.bind(this));
 
         this.chatService.listener.on('event', function(event: any, stopListening: Function) {
             console.log(event);
         }.bind(this));
-        
+
         this.chatService.listener.on('typ', function(event: any, stopListening: Function) {
-            console.log(event);
+            if (this.currentFriend && this.currentFriend.userID == event.from) {
+                this.currentFriend.isTyping = event.isTyping;
+                this.emit('change');
+                console.log("listen: %s %s: %o", this.currentFriend.fullName, this.currentFriend.isTyping? "is typing..." : "stopped typing", event);
+            }
         }.bind(this));
 
         this.chatService.listener.on('presence', function(event: any, stopListening: Function) {
-            for(let user in this.friendList) {
-               if(user.userID == event.userID){
+            for (let user in this.friendList) {
+                if (user.userID == event.userID) {
                     user.presence.status = event.statuses.status;
                     break;
-               }  
+                }
             }
         }.bind(this));
     }

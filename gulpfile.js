@@ -20,6 +20,7 @@ var babel = require("gulp-babel"),
     source = require('vinyl-source-stream'),
     sourcemaps = require('gulp-sourcemaps'),
     spawn = require('child_process').spawn,
+    SpecReporter = require('jasmine-spec-reporter'),
     tsc = require('gulp-typescript'),
     transform = require('vinyl-transform'),
     typescript = require('typescript');
@@ -54,7 +55,7 @@ gulp.task('compile-test', ['copy-jsx-test'], function(){
 gulp.task('test', ['compile-test'], function(){
   process.env.NODE_ENV = 'development';
   return gulp.src('./tests/out/tests/specs/**/*.js')
-      .pipe(jasmine({includeStackTrace: true}));
+      .pipe(jasmine({includeStackTrace: true, reporter: new SpecReporter()}));
 });
 
 /**
@@ -222,7 +223,7 @@ gulp.task('atom-create', ['atom-clean', 'browserify', 'copy-static'], function (
         cache: './electron/cache',
         version: electronVersion,
         packaging: false,
-        asar: false,
+        asar: true,
         platforms: ['win32-ia32'],//, 'darwin-x64'],
         platformResources: {
             // darwin: {
