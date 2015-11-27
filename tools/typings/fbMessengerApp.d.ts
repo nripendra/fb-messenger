@@ -36,6 +36,8 @@
 
 /// <reference path="../../src/components/message-item.tsx" />
 
+/// <reference path="../../src/components/search-field.tsx" />
+
 /// <reference path="../../src/components/send-message-text-field.tsx" />
 
 /// <reference path="../../src/components/typing-indicator.tsx" />
@@ -47,6 +49,8 @@
 /// <reference path="../../src/services/chatservice.ts" />
 
 /// <reference path="../../src/services/loginservice.ts" />
+
+/// <reference path="../../src/services/string-score.ts" />
 
 /// <reference path="../../src/stores/auto-updaterstore.ts" />
 

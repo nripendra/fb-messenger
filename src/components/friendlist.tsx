@@ -2,6 +2,8 @@ import * as React from 'react';
 import {Hbox, Vbox} from './layout';
 import ChatAction from '../actions/chatactions';
 import AppStores from '../appstores';
+import SearchField from "./search-field"
+import stringScore from "../services/string-score"
 
 const Popover = require('./popover');
 const Avatar = require('material-ui/lib/avatar');
@@ -33,6 +35,7 @@ injectTapEventPlugin();
 export class FriendListProps {
     friendList: Array<any>;
     currentFriend: any;
+    friendListFilterText: string;
 }
 
 export default class FriendList extends React.Component<FriendListProps, any> {
@@ -110,8 +113,22 @@ export default class FriendList extends React.Component<FriendListProps, any> {
             'maxHeight': 'calc(100vh - 63px)'
         };
 
+        var friendListFilterText: string = this.props.friendListFilterText || "";
+        var checkScore: boolean = friendListFilterText.trim().length > 0
         var _self = this;
         var friendList = (this.props.friendList || []).sort((x, y) => {
+            x.searchScore = 0;
+            y.searchScore = 0;
+            if(friendListFilterText !== "") {
+                var xScore = stringScore(x.fullName, friendListFilterText);
+                var yScore = stringScore(y.fullName, friendListFilterText);
+                
+                x.searchScore = xScore;
+                y.searchScore = yScore;
+                
+                var diff = yScore - xScore;
+                return diff;
+            }
             var xMessage: any = (AppStores.chatStore.messages[x.userID] || []);
             var yMessage: any = (AppStores.chatStore.messages[y.userID] || []);
             if (xMessage.length > 0) {
@@ -138,14 +155,13 @@ export default class FriendList extends React.Component<FriendListProps, any> {
                 }
             }
             return diff;
-        }).filter(x => x.isFriend === true);
+        }).filter(x => x.isFriend === true && (checkScore === false || x.searchScore > 0.35));
         
         let leftPane = { 'height': 'calc(100vh - 8px)', 'maxHeight': 'calc(100vh - 8px)' };
-        let searchTextField = { width: '180px' };
         return (<div style={leftPane}>
                  <Toolbar>
                     <ToolbarGroup key={0} float="left">
-                        <TextField hintText="Search..." style={searchTextField} />
+                        <SearchField />
                         </ToolbarGroup>
                     <ToolbarGroup key={1} float="right">
                         <ToolbarSeparator/>
