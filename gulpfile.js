@@ -54,6 +54,7 @@ gulp.task('compile-test', ['copy-jsx-test'], function(){
 
 gulp.task('test', ['compile-test'], function(){
   process.env.NODE_ENV = 'development';
+  global.electronRequire = require;
   return gulp.src('./tests/out/tests/specs/**/*.js')
       .pipe(jasmine({includeStackTrace: true, reporter: new SpecReporter()}));
 });
@@ -145,7 +146,7 @@ gulp.task('browserify-copy_node_modules', function () {
     "har-validator", "has-unicode", "hawk", "hoek", "htmlparser2", "http-signature", 
     "inherits", "isarray", "is-my-json-valid", "is-property", "is-typedarray", "isstream", 
     "jodid25519", "jsbn", "json-schema", "json-stringify-safe", "jsonpointer", "jsprim", 
-    "lodash", "lodash._basetostring", "lodash._createpadding", "lodash.pad", "lodash.padleft", "lodash.padright", "lodash.repeat", 
+    "lodash", "lodash._basetostring", "lodash._createpadding", "lodash._getnative", "lodash.debounce", "lodash.pad", "lodash.padleft", "lodash.padright", "lodash.repeat", 
     "mime-db", "mime-types", 
     "node-uuid", "npmlog", "nth-check", 
     "oauth-sign", 

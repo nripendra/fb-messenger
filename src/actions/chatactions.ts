@@ -25,5 +25,9 @@ export default {
     endTypingIndicator(threadID: string) {
         console.log("chatAction: endTypingIndicator : %so", threadID);
         dispatcher.dispatch("endTypingIndicator", threadID);
+    },
+    filterFriendList(filterText: string){
+        console.log("chatAction: filterFriendList : %s", filterText);
+        dispatcher.dispatch("filterFriendList", filterText);
     }
 };
