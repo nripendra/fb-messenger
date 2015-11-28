@@ -312,6 +312,10 @@ gulp.task("release", function(){
                     git.reset("HEAD~1", {args: "--hard"}, function(){
                         throw err;    
                     });
+                } else {
+                    git.push("origin", "master", {args: "--follow-tags"}, function (err) {
+                        if (err) throw err;
+                    });
                 }
             });
         });
