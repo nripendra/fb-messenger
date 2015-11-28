@@ -6,6 +6,7 @@
 
 * Change log ([425568e](https://github.com/nripendra/fb-messenger/commit/425568e))
 * Change log ([4ded767](https://github.com/nripendra/fb-messenger/commit/4ded767))
+* start tracking changelog.md ([edfca92](https://github.com/nripendra/fb-messenger/commit/edfca92))
 
 
 
