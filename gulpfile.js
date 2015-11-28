@@ -329,7 +329,7 @@ gulp.task("release", function () {
                 git.commit('Generated release-notes and change-logs', { args: '-A' });
                 fs.readFile("./Release-notes.md", 'utf8', function (err, data) {
                     if (err) throw err;
-                    git.tag(packageJson.version, "Release " + packageJson.version, { args: "-a -F ./release-notes.md" }, function (err) {
+                    git.exec({ args: "tag -a " + packageJson.version + " -F ./release-notes.md" }, function (err, stdout) {
                         if (err) {
                             git.reset("HEAD~1", { args: "--hard" }, function () {
                                 throw err;
