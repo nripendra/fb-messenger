@@ -306,7 +306,7 @@ gulp.task('run',  function(cb) {
 
 gulp.task('changes', function () {
   return conventionalChangelog({
-    preset: 'atom',
+    preset: 'angular',
     releaseCount: 0
   })
     .pipe(fs.createWriteStream('CHANGELOG.md'));
