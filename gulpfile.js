@@ -304,7 +304,9 @@ gulp.task('run',  function(cb) {
 
 gulp.task("release", function(){
     git.status({args: "--porcelain"}, function(err, stdout){
-        console.log("out: " + stdout);
+        if(stdout != ""){
+            throw "Please commit/undo all your changes before release";
+        }
     });
 });
 
