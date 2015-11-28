@@ -323,9 +323,10 @@ gulp.task("change-logs", function () {
 
 gulp.task("commit-and-push", function (callback) {
     console.log("after run sequence");
-    git.exec({ args: 'commit -a -m "Generated release-notes and change-logs"' }, function (err) {
-        console.log("after commit");
+    git.exec({ args: 'commit -a -m "Generated release-notes and change-logs"' }, function (err, stdout) {
+        console.log(stdout);
         if (err) throw err;
+        console.log("after commit");
         fs.readFile("./Release-notes.md", 'utf8', function (err, data) {
             if (err) throw err;
             git.exec({ args: "tag -a " + packageJson.version + " -F ./release-notes.md" }, function (err, stdout) {
