@@ -316,11 +316,9 @@ gulp.task('release-notes', function () {
 });
 
 gulp.task("change-logs", function () {
-    return gulp.src("./CHANGELOG.md", {
-        read: false
-    }).pipe(conventionalChangelog({
+    return gulp.src("./CHANGELOG.md").pipe(conventionalChangelog({
         preset: 'angular',
-        releaseCount: 0
+        releaseCount: 1
     }))
         .pipe(gulp.dest('./'));
 });
