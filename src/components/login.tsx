@@ -73,10 +73,10 @@ export default class Login extends React.Component<LoginProps, any> {
                                 <Hbox>
                                 <Vbox>
                                     <Hbox>
-                                    <TextField required={true} hintText="Username" type="text" ref="username" floatingLabelText="Username:" errorText={store.errors.username} />
+                                    <TextField required={true} onEnterKeyDown={this.dologin.bind(this)} hintText="Username" type="text" ref="username" floatingLabelText="Username:" errorText={store.errors.username} />
                                     </Hbox>
                                     <Hbox>
-                                    <TextField required={true} hintText="Password" type="password" ref="password" floatingLabelText="Password:" errorText={store.errors.password} />
+                                    <TextField required={true} onEnterKeyDown={this.dologin.bind(this)} hintText="Password" type="password" ref="password" floatingLabelText="Password:" errorText={store.errors.password} />
                                     </Hbox>
                                 </Vbox>
                                 </Hbox>
