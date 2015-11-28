@@ -4,7 +4,7 @@ var babel = require("gulp-babel"),
     babelify = require("babelify"),
     Browserify = require('browserify'),
     Config = require('./gulpfile.config'),
-    conventionalChangelog = require('conventional-changelog'),
+    conventionalChangelog = require('gulp-conventional-changelog'),
     del = require('del'),
     electron = require('gulp-electron'),
     fs = require('fs'),
@@ -305,12 +305,12 @@ gulp.task('run', function (cb) {
 });
 
 gulp.task('release-notes', function () {
-    return conventionalChangelog({
+    return gulp.src("./release-notes.md").pipe(conventionalChangelog({
         preset: 'angular',
         releaseCount: 1
-    })
-    .pipe(fs.createWriteStream('release-notes.md'))
-    .pipe(insert.prepend('#Release :' + packageJson.version));
+    }))
+    .pipe(insert.prepend('#Release :' + packageJson.version))
+    .pipe(gulp.dest('./'));
 });
 
 gulp.task("change-logs", function () {
