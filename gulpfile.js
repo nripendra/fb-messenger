@@ -27,39 +27,39 @@ var babel = require("gulp-babel"),
     tsc = require('gulp-typescript'),
     transform = require('vinyl-transform'),
     typescript = require('typescript');
-    //zip = require('gulp-zip');
+//zip = require('gulp-zip');
 
 var config = new Config();
-var tsconfig = tsc.createProject('tsconfig.json', {typescript: typescript});
+var tsconfig = tsc.createProject('tsconfig.json', { typescript: typescript });
 var packageJson = require('./package.json');
 
 gulp.task('copy-jsx-test', function () {
     return gulp.src("./src/**/*.jsx")
-        .pipe(babel({stage: 0}))
+        .pipe(babel({ stage: 0 }))
         .pipe(gulp.dest("./tests/out/src/"));
 });
 
-gulp.task('compile-test', ['copy-jsx-test'], function(){
-  var sourceTsFiles = ["./tests/specs/**/*.{ts,tsx}",
-  "./tools/typings/**/*.ts",
-  "./src/**/*.{ts,tsx}",
-  config.appTypeScriptReferences];
+gulp.task('compile-test', ['copy-jsx-test'], function () {
+    var sourceTsFiles = ["./tests/specs/**/*.{ts,tsx}",
+        "./tools/typings/**/*.ts",
+        "./src/**/*.{ts,tsx}",
+        config.appTypeScriptReferences];
 
-  var tsResult = gulp.src(sourceTsFiles)
-      .pipe(tsc(tsconfig));
+    var tsResult = gulp.src(sourceTsFiles)
+        .pipe(tsc(tsconfig));
 
-  tsResult.dts.pipe(gulp.dest("./tests/out/"));
+    tsResult.dts.pipe(gulp.dest("./tests/out/"));
 
-  return tsResult.js
-      .pipe(babel({stage: 0}))
-      .pipe(gulp.dest("./tests/out/"))
+    return tsResult.js
+        .pipe(babel({ stage: 0 }))
+        .pipe(gulp.dest("./tests/out/"))
 });
 
-gulp.task('test', ['compile-test'], function(){
-  process.env.NODE_ENV = 'development';
-  global.electronRequire = require;
-  return gulp.src('./tests/out/tests/specs/**/*.js')
-      .pipe(jasmine({includeStackTrace: true, reporter: new SpecReporter()}));
+gulp.task('test', ['compile-test'], function () {
+    process.env.NODE_ENV = 'development';
+    global.electronRequire = require;
+    return gulp.src('./tests/out/tests/specs/**/*.js')
+        .pipe(jasmine({ includeStackTrace: true, reporter: new SpecReporter() }));
 });
 
 /**
@@ -78,7 +78,7 @@ gulp.task('clean-ts', function (cb) {
  */
 gulp.task('gen-ts-refs', ['clean-ts'], function () {
     var target = gulp.src(config.appTypeScriptReferences);
-    var sources = gulp.src(config.allTypeScript, {read: false});
+    var sources = gulp.src(config.allTypeScript, { read: false });
     return target.pipe(inject(sources, {
         starttag: '//{',
         endtag: '//}',
@@ -115,59 +115,59 @@ gulp.task('compile-ts', ['gen-ts-refs'], function () {
 
 gulp.task('copy-jsx', function () {
     return gulp.src(config.source + '**/*.jsx')
-        .pipe(babel({stage: 0}))
+        .pipe(babel({ stage: 0 }))
         .pipe(gulp.dest(config.tsOutputPath))
 });
 
-gulp.on('err', function(e) {
-  console.log(e.err.stack);
+gulp.on('err', function (e) {
+    console.log(e.err.stack);
 });
 
-gulp.task('browserify-bundle', ['copy-jsx','compile-ts'], function (cb) {
-    var babelifyStep = babelify.configure({stage: 0});
+gulp.task('browserify-bundle', ['copy-jsx', 'compile-ts'], function (cb) {
+    var babelifyStep = babelify.configure({ stage: 0 });
 
-    var allFiles = glob.sync(config.tsOutputPath + "**/*.{js,jsx}", {ignore: [config.tsOutputPath + 'index.js', config.tsOutputPath + 'stdio-redirect.js']});
+    var allFiles = glob.sync(config.tsOutputPath + "**/*.{js,jsx}", { ignore: [config.tsOutputPath + 'index.js', config.tsOutputPath + 'stdio-redirect.js'] });
     var bundler = new Browserify({
         entries: allFiles,
-        transform: [ babelifyStep ]
+        transform: [babelifyStep]
     });
-        return bundler
+    return bundler
         .bundle()
         .pipe(source('program.js'))
         .pipe(gulp.dest(config.compiled));
 });
 
 gulp.task('browserify-copy_node_modules', function () {
-    var modules = ["ansi", "are-we-there-yet", "asn1", "assert-plus", "assert-plus", "async", "aws-sign2", 
-    "bl", "bluebird", "boolbase", "boom", 
-    "caseless", "cheerio", "combined-stream", "core-util-is", "cryptiles", "css-select", "css-what", 
-    "dashdash", "delayed-stream", "delegates", "dom-serializer", "domelementtype","domhandler", "domutils", 
-    "ecc-jsbn", "entities", "extend", "extsprintf", 
-    "facebook-chat-api", "fast-download", "forever-agent", "form-data", "form-data-rc3", 
-    "gauge", "generate-function", 
-    "generate-object-property", 
-    "har-validator", "has-unicode", "hawk", "hoek", "htmlparser2", "http-signature", 
-    "inherits", "isarray", "is-my-json-valid", "is-property", "is-typedarray", "isstream", 
-    "jodid25519", "jsbn", "json-schema", "json-stringify-safe", "jsonpointer", "jsprim", 
-    "lodash", "lodash._basetostring", "lodash._createpadding", "lodash._getnative", "lodash.debounce", "lodash.pad", "lodash.padleft", "lodash.padright", "lodash.repeat", 
-    "mime-db", "mime-types", 
-    "node-uuid", "npmlog", "nth-check", 
-    "oauth-sign", 
-    "pinkie-promise", "process-nextick-args",
-    "qs", 
-    "readable-stream", "request", 
-    "sntp", "sshpk", "string_decoder", "stringstream", 
-    "tough-cookie", "tunnel-agent", "tweetnacl", 
-    "util-deprecate", 
-    "verror", 
-    "xtend"]
-                    .map(function(x){return './node_modules/' + x + '/**/*'; });
-    return gulp.src(modules, { "base" : "." })
-               .pipe(gulp.dest('./out/compile/'));
+    var modules = ["ansi", "are-we-there-yet", "asn1", "assert-plus", "assert-plus", "async", "aws-sign2",
+        "bl", "bluebird", "boolbase", "boom",
+        "caseless", "cheerio", "combined-stream", "core-util-is", "cryptiles", "css-select", "css-what",
+        "dashdash", "delayed-stream", "delegates", "dom-serializer", "domelementtype", "domhandler", "domutils",
+        "ecc-jsbn", "entities", "extend", "extsprintf",
+        "facebook-chat-api", "fast-download", "forever-agent", "form-data", "form-data-rc3",
+        "gauge", "generate-function",
+        "generate-object-property",
+        "har-validator", "has-unicode", "hawk", "hoek", "htmlparser2", "http-signature",
+        "inherits", "isarray", "is-my-json-valid", "is-property", "is-typedarray", "isstream",
+        "jodid25519", "jsbn", "json-schema", "json-stringify-safe", "jsonpointer", "jsprim",
+        "lodash", "lodash._basetostring", "lodash._createpadding", "lodash._getnative", "lodash.debounce", "lodash.pad", "lodash.padleft", "lodash.padright", "lodash.repeat",
+        "mime-db", "mime-types",
+        "node-uuid", "npmlog", "nth-check",
+        "oauth-sign",
+        "pinkie-promise", "process-nextick-args",
+        "qs",
+        "readable-stream", "request",
+        "sntp", "sshpk", "string_decoder", "stringstream",
+        "tough-cookie", "tunnel-agent", "tweetnacl",
+        "util-deprecate",
+        "verror",
+        "xtend"]
+        .map(function (x) { return './node_modules/' + x + '/**/*'; });
+    return gulp.src(modules, { "base": "." })
+        .pipe(gulp.dest('./out/compile/'));
 });
 
 gulp.task('browserify', function (cb) {
-    return runSequence('browserify-bundle' ,'browserify-copy_node_modules', cb);
+    return runSequence('browserify-bundle', 'browserify-copy_node_modules', cb);
 });
 
 gulp.task('less', function () {
@@ -190,12 +190,12 @@ gulp.task('3rd-party-assets', ['font-awesome', 'min-emoji']);
 
 gulp.task('copy-static', function () {
     gulp.src('./out/js/index.js')
-        .pipe(babel({stage: 0}))
+        .pipe(babel({ stage: 0 }))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(config.compiled));
-        
-   gulp.src('./out/js/stdio-redirect.js')
-        .pipe(babel({stage: 0}))
+
+    gulp.src('./out/js/stdio-redirect.js')
+        .pipe(babel({ stage: 0 }))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(config.compiled));
 
@@ -206,7 +206,7 @@ gulp.task('copy-static', function () {
 var electronVersion = 'v0.35.0';
 
 gulp.task('atom-kill', function (cb) {
-    if(process.platform == 'win32'){
+    if (process.platform == 'win32') {
         spawn('taskkill', ["/im", "fb-messenger.exe", "/f", "/t"]);
     } else {
         spawn('killall', ['-I', '-w', 'fb-messenger.exe']);
@@ -214,38 +214,38 @@ gulp.task('atom-kill', function (cb) {
     cb();
 });
 
-gulp.task('atom-clean', ['atom-kill'], function(cb){
+gulp.task('atom-clean', ['atom-kill'], function (cb) {
     return del('./electron/build/**/*.*', cb);
 });
 
 gulp.task('atom-create', ['atom-clean', 'browserify', 'copy-static'], function () {
     return gulp.src("")
-    .pipe(electron({
-        src: './out/compile',
-        packageJson: packageJson,
-        release: './electron/build',
-        cache: './electron/cache',
-        version: electronVersion,
-        packaging: false,
-        asar: true,
-        platforms: ['win32-ia32'],//, 'darwin-x64'],
-        platformResources: {
-            // darwin: {
-            //     CFBundleDisplayName: packageJson.name,
-            //     CFBundleIdentifier: packageJson.name,
-            //     CFBundleName: packageJson.name,
-            //     CFBundleVersion: packageJson.version,
-            //     icon: 'fb-messenger.icns'
-            // },
-            win: {
-                "version-string": packageJson.version,
-                "file-version": packageJson.version,
-                "product-version": packageJson.version,
-                "icon": 'fb-messenger.ico'
+        .pipe(electron({
+            src: './out/compile',
+            packageJson: packageJson,
+            release: './electron/build',
+            cache: './electron/cache',
+            version: electronVersion,
+            packaging: false,
+            asar: true,
+            platforms: ['win32-ia32'],//, 'darwin-x64'],
+            platformResources: {
+                // darwin: {
+                //     CFBundleDisplayName: packageJson.name,
+                //     CFBundleIdentifier: packageJson.name,
+                //     CFBundleName: packageJson.name,
+                //     CFBundleVersion: packageJson.version,
+                //     icon: 'fb-messenger.icns'
+                // },
+                win: {
+                    "version-string": packageJson.version,
+                    "file-version": packageJson.version,
+                    "product-version": packageJson.version,
+                    "icon": 'fb-messenger.ico'
+                }
             }
-        }
-    }))
-    .pipe(gulp.dest(""));
+        }))
+        .pipe(gulp.dest(""));
     // return atom({
     //     srcPath: './out/compile',
     //     releasePath: './electron/build',
@@ -258,7 +258,7 @@ gulp.task('atom-create', ['atom-clean', 'browserify', 'copy-static'], function (
 });
 
 gulp.task('atom', ['less', '3rd-party-assets'], function (cb) {
-    return runSequence('atom-clean','atom-create', cb);
+    return runSequence('atom-clean', 'atom-create', cb);
 });
 
 gulp.task('atom-run', ['atom'], function (cb) {
@@ -270,82 +270,82 @@ gulp.task('watch', function () {
     gulp.watch([config.allTypeScript, config.source + '**/*.jsx'], ['run']);
 });
 
-gulp.task('inno-script-transform',  function(){
+gulp.task('inno-script-transform', function () {
     return gulp.src('./installer_script.iss').pipe(replace([
-        ["{{appname}}", packageJson.name], 
+        ["{{appname}}", packageJson.name],
         ["{{appver}}", packageJson.version],
         ["{{outputfilename}}", packageJson.name + "-setup"],
         ["{{OutputDir}}", "./installer"],
         ["{{PackageFiles}}", "./electron/build/" + electronVersion + "/win32-ia32/*.*"]
-        ]))
-    .pipe(rename("installer_script.temp.iss"))
-    .pipe(gulp.dest('./'));
+    ]))
+        .pipe(rename("installer_script.temp.iss"))
+        .pipe(gulp.dest('./'));
 });
 
-gulp.task('inno-script-exec', function(){
+gulp.task('inno-script-exec', function () {
     return gulp.src('./installer_script.temp.iss')
-               .pipe(inno());
+        .pipe(inno());
 });
 
-gulp.task('build', function(cb) {
-    return runSequence('test','browserify', 'copy-static', 'less', '3rd-party-assets', cb);
+gulp.task('build', function (cb) {
+    return runSequence('test', 'browserify', 'copy-static', 'less', '3rd-party-assets', cb);
 });
 
-gulp.task('package-win32', ['build'], function(cb){
-     return runSequence('atom', 'inno-script-transform', 'inno-script-exec', function(){
-         console.log("deleting temporary installer_script...");
-         del('./installer_script.temp.iss');
-         
-         if(cb) cb();
-     });
+gulp.task('package-win32', ['build'], function (cb) {
+    return runSequence('atom', 'inno-script-transform', 'inno-script-exec', function () {
+        console.log("deleting temporary installer_script...");
+        del('./installer_script.temp.iss');
+
+        if (cb) cb();
+    });
 });
 
-gulp.task('run',  function(cb) {
+gulp.task('run', function (cb) {
     return runSequence('atom-run', 'watch', cb);
 });
 
 gulp.task('release-notes', function () {
-  return conventionalChangelog({
-    preset: 'angular',
-    releaseCount: 1
-  })
-    .pipe(fs.createWriteStream('Release-notes.md'));
+    return conventionalChangelog({
+        preset: 'angular',
+        releaseCount: 1
+    })
+        .pipe(fs.createWriteStream('Release-notes.md'));
 });
 
 gulp.task("change-logs", function () {
-  return conventionalChangelog({
-    preset: 'angular',
-    releaseCount: 0
-  })
-    .pipe(fs.createWriteStream('CHANGELOG.md'));
+    return conventionalChangelog({
+        preset: 'angular',
+        releaseCount: 0
+    })
+        .pipe(fs.createWriteStream('CHANGELOG.md'));
 });
 
-gulp.task("release", function(){
-    git.checkout("master", function(err){
-        if(err)throw err;
-        runSequence(["release-notes", "change-logs"], function(){
-            git.commit('Generated release-notes and change-logs', {args: '-A'});
-            git.merge('develop', function (err) {
-                if (err) throw err;
-                fs.readFile("./Release-notes.md", 'utf8', function(err, data) {
+gulp.task("release", function () {
+    git.checkout("master", function (err) {
+        if (err) throw err;
+        git.merge('develop', function (err) {
+            if (err) throw err;
+            runSequence(["release-notes", "change-logs"], function () {
+                git.commit('Generated release-notes and change-logs', { args: '-A' });
+                fs.readFile("./Release-notes.md", 'utf8', function (err, data) {
                     if (err) throw err;
-                    git.tag(packageJson.version, data, {args: "-a"}, function (err) {
+                    git.tag(packageJson.version, data, { args: "-a" }, function (err) {
                         if (err) {
-                            git.reset("HEAD~1", {args: "--hard"}, function(){
-                                throw err;    
+                            git.reset("HEAD~1", { args: "--hard" }, function () {
+                                throw err;
                             });
                         } else {
-                            git.push("origin", "master", {args: "--follow-tags"}, function (err) {
+                            git.push("origin", "master", { args: "--follow-tags" }, function (err) {
                                 if (err) throw err;
-                                git.checkout("develop", function(err) {
+                                git.checkout("develop", function (err) {
                                     if (err) throw err;
-                                    git.merge("master", function(err){
+                                    git.merge("master", function (err) {
                                         if (err) throw err;
-                                        git.push("origin", "develop", function(err){
+                                        git.push("origin", "develop", function (err) {
                                             if (err) throw err;
-                                            git.checkout("master", function(err) {
+                                            git.checkout("master", function (err) {
                                                 if (err) throw err;
-                                                git.checkout("release-" + packageJson.version, {args: "-b"}, function(err) {
+                                                git.checkout("release-" + packageJson.version, { args: "-b" }, function (err) {
                                                     if (err) throw err;
                                                 });
                                             });
