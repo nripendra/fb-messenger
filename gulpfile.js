@@ -321,9 +321,9 @@ gulp.task("change-logs", function () {
         .pipe(gulp.dest('./'));
 });
 
-gulp.task("commit-and-push", function () {
+gulp.task("commit-and-push", function (callback) {
     console.log("after run sequence");
-    git.commit('Generated release-notes and change-logs', { args: '-a' }, function (err) {
+    git.exec({ args: 'commit -a -m "Generated release-notes and change-logs"' }, function (err) {
         console.log("after commit");
         if (err) throw err;
         fs.readFile("./Release-notes.md", 'utf8', function (err, data) {
@@ -346,6 +346,7 @@ gulp.task("commit-and-push", function () {
                                         if (err) throw err;
                                         git.checkout("release-" + packageJson.version, { args: "-b" }, function (err) {
                                             if (err) throw err;
+                                            callback();
                                         });
                                     });
                                 })
