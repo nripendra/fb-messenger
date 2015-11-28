@@ -309,8 +309,8 @@ gulp.task('release-notes', function () {
         preset: 'angular',
         releaseCount: 1
     })
-    .pipe(insert.prepend('#Release :' + packageJson.version))
-    .pipe(fs.createWriteStream('release-notes.md'));
+    .pipe(fs.createWriteStream('release-notes.md'))
+    .pipe(insert.prepend('#Release :' + packageJson.version));
 });
 
 gulp.task("change-logs", function () {
