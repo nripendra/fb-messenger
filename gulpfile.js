@@ -327,8 +327,9 @@ gulp.task("release", function () {
         git.merge('develop', function (err) {
             if (err) throw err;
             runSequence(["release-notes", "change-logs"], function () {
-                git.commit('Generated release-notes and change-logs', { args: '-a' }, function (err) {
+                git.exec({ args: "commit -a -m 'Generated release-notes and change-logs'"}, function (err) {
                     if (err) throw err;
+                    console.log("committed");
                     fs.readFile("./Release-notes.md", 'utf8', function (err, data) {
                         if (err) throw err;
                         git.exec({ args: "tag -a " + packageJson.version + " -F ./release-notes.md" }, function (err, stdout) {
