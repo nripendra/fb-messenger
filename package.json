@@ -39,6 +39,7 @@
     "gulp-sourcemaps": "^1.6.0",
     "gulp-typescript": "^2.9.2",
     "h5f": "^1.1.1",
+    "jasmine-spec-reporter": "^2.4.0",
     "jsdom": "^6.1.0",
     "react-addons-test-utils": "^0.14.3",
     "run-sequence": "^1.1.4",

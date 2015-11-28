@@ -6,10 +6,16 @@ import AutoUpdateService from "../../src/services/auto-updateservice";
 import Login from '../../src/components/login';
 import FriendList from '../../src/components/friendlist';
 import MessageItem from '../../src/components/message-item';
+import Conversation from "../../src/components/conversation";
 import AppStores from '../../src/appstores';
 import LoginActions from '../../src/actions/loginactions';
 import LoginService from '../../src/services/loginservice';
 import ChatStore from '../../src/stores/chatstore';
+import ChatActions from '../../src/actions/chatactions';
+import SendMessageTextField from "../../src/components/send-message-text-field";
+import TypingIndicator from '../../src/components/typing-indicator';
+
+const TextField = require("material-ui/lib/text-field");
 
 import * as jsdom from 'jsdom';
 let React: any = null;
@@ -29,10 +35,13 @@ describe("fb-messenger", () => {
         });
 
         it("should show chat component when loginStore.isAuthenticated is true", () => {
+            (global as any).electronRequire = (module: string)=> {
+                return {getCurrentWindow: ()=> {return {isFocused: false};}};
+            };
             AppStores.loginStore.isAuthenticated = true;
             AppStores.loginStore.api = {
                 setOptions: () => { return; },
-                getCurrentUserID: () => { return "123" },
+                getCurrentUserID: () => { return "123"; },
                 getFriendsList: function(currentUserId:any, cb:Function){
                     cb(null, [{"1": {id: "1", name:"Friend1"}}]);
                 },
@@ -158,7 +167,77 @@ describe("fb-messenger", () => {
             }, 10);
         });
     });
-    
+
+    describe("conversation", ()=> {
+        it("should send markAsRead if new message arrives when the currentWindow is active and textbox is focused", (done: Function)=> {
+            (global as any).electronRequire = (module: string)=> {
+                return {
+                    getCurrentWindow: ()=> {
+                        return {isFocused: ()=> true};
+                    }
+                };
+            };
+
+            var api = {
+                getCurrentUserID: ()=> { return 10;},
+                markAsRead: ()=> {return;},
+                getFriendsList: ()=> {return;},
+                setOptions: ()=> {return;},
+                getOnlineUsers: ()=> {return;}
+            };
+            AppStores.chatStore.loadFriendList(api);
+
+            spyOn(api, "markAsRead").and.callFake(function() {
+                return;// noop
+            });
+
+            var conversation = ReactDom.render(<Conversation
+                                messages={[{body:"hello", senderID: 1}]}
+                                currentFriend={{id: 1}}
+                                currentUser={{id: 10}} />,
+                            document.getElementById("fb-messenger"));
+            conversation.isFocused = true;
+            conversation.handleTextFieldFocus();
+
+            expect(api.markAsRead).toHaveBeenCalled();
+            setTimeout(done, 5);
+        });
+
+        it("should not markAsRead if there is no new message when the currentWindow is active and textbox is focused", (done: Function)=> {
+            (global as any).electronRequire = (module: string)=> {
+                return {
+                    getCurrentWindow: ()=> {
+                        return {isFocused: ()=> true};
+                    }
+                };
+            };
+
+            var api = {
+                getCurrentUserID: ()=> { return 10;},
+                markAsRead: ()=> {return;},
+                getFriendsList: ()=> {return;},
+                setOptions: ()=> {return;},
+                getOnlineUsers: ()=> {return;}
+            };
+            AppStores.chatStore.loadFriendList(api);
+
+            spyOn(api, "markAsRead").and.callFake(function() {
+                return;// noop
+            });
+
+            var conversation = ReactDom.render(<Conversation
+                                messages={[{body:"hello", senderID: 1, isSeen: true}]}
+                                currentFriend={{id: 1}}
+                                currentUser={{id: 10}} />,
+                            document.getElementById("fb-messenger"));
+            conversation.isFocused = true;
+            conversation.handleTextFieldFocus();
+
+            expect(api.markAsRead).not.toHaveBeenCalled();
+            setTimeout(done, 5);
+        });
+    });
+
     describe("message-item", ()=>
     {
         it("should show the message body if there is no attachments",() => {
@@ -198,6 +277,33 @@ describe("fb-messenger", () => {
             var emoji = ReactTestUtils.scryRenderedDOMComponentsWithClass(messageItem, "em");
             expect(emoji.length).toBe(1);
             expect(ReactDom.findDOMNode(emoji[0]).className).toBe('em emj186');
+        });
+    });
+    
+    describe("typing-indicator", ()=>
+    {
+        it("should show typing indicator when user's isTyping property is set to true",() => {
+            var typingIndicator = ReactDom.render(<TypingIndicator currentFriend={{userID: '1', isTyping: true, profilePicture: 'http://propic1.com/'}} />, document.getElementById('fb-messenger'));
+            var indicator = ReactTestUtils.scryRenderedDOMComponentsWithClass(typingIndicator, "typing-indicator");
+            expect(indicator.length).toBe(1);
+        });
+        
+        it("shouldn't show typing indicator when user's isTyping property is set to false",() => {
+            var typingIndicator = ReactDom.render(<TypingIndicator currentFriend={{userID: '1', isTyping: false, profilePicture: 'http://propic1.com/'}} />, document.getElementById('fb-messenger'));
+            var indicator = ReactTestUtils.scryRenderedDOMComponentsWithClass(typingIndicator, "typing-indicator");
+            expect(indicator.length).toBe(0);
+        });
+        
+        it("should show user's thumbnail profile picture if isTyping property is set to true",() => {
+            var typingIndicator = ReactDom.render(<TypingIndicator currentFriend={{userID: '1', isTyping: true, profilePicture: 'http://propic1.com/'}} />, document.getElementById('fb-messenger'));
+            var thumbnail = ReactTestUtils.scryRenderedDOMComponentsWithTag(typingIndicator, "img");
+            expect(thumbnail.length).toBe(1);
+        });
+        
+        it("shouldn't show user's thumbnail profile picture if isTyping property is set to flase",() => {
+            var typingIndicator = ReactDom.render(<TypingIndicator currentFriend={{userID: '1', isTyping: false, profilePicture: 'http://propic1.com/'}} />, document.getElementById('fb-messenger'));
+            var thumbnail = ReactTestUtils.scryRenderedDOMComponentsWithTag(typingIndicator, "img");
+            expect(thumbnail.length).toBe(0);
         });
     });
 
@@ -303,6 +409,33 @@ describe("fb-messenger", () => {
                     return;
                 }
             };
+        });
+    });
+    
+    describe("Send text message", ()=>{
+        it("should send the typed message when send button is clicked", () => {
+            var api = {
+                getCurrentUserID: ()=> { return 10;},
+                markAsRead: ()=> {return;},
+                getFriendsList: ()=> {return;},
+                setOptions: ()=> {return;},
+                getOnlineUsers: ()=> {return;},
+                sendMessage: ()=>{return}
+            };
+            AppStores.chatStore.loadFriendList(api);
+
+           spyOn(api, "sendMessage").and.callFake(function() {
+                return;// noop
+           });
+           var sendMessageTextField = ReactDom.render(<SendMessageTextField 
+                                                            currentFriend={{userID: '1', profilePicture: 'http://propic1.com/'}} 
+                                                            currentUser={{userID:'10'}}
+                                                            onTextFieldFocus={()=>{}}
+                                                            onTextFieldBlur={()=>{}} />, 
+                                                            document.getElementById('fb-messenger'));
+           sendMessageTextField.handleSendMessage();
+           
+           expect(api.sendMessage).toHaveBeenCalled();
         });
     });
     
