@@ -365,7 +365,7 @@ gulp.task("release", function (callback) {
         if (err) throw err;
         git.merge('develop', function (err) {
             if (err) throw err;
-            runSequence(["release-notes", "change-logs", "commit-and-push"], callback);
+            runSequence(["release-notes", "change-logs"], "commit-and-push", callback);
         });
     });
 });
