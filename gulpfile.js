@@ -4,8 +4,10 @@ var babel = require("gulp-babel"),
     babelify = require("babelify"),
     Browserify = require('browserify'),
     Config = require('./gulpfile.config'),
+    conventionalChangelog = require('conventional-changelog'),
     del = require('del'),
     electron = require('gulp-electron'),
+    fs = require('fs'),
     git = require('gulp-git'),
     glob = require('glob'),
     gulp = require('gulp'),
@@ -300,6 +302,14 @@ gulp.task('package-win32', ['build'], function(cb){
 
 gulp.task('run',  function(cb) {
     return runSequence('atom-run', 'watch', cb);
+});
+
+gulp.task('changes', function () {
+  return conventionalChangelog({
+    preset: 'atom',
+    releaseCount: 0
+  })
+    .pipe(fs.createWriteStream('CHANGELOG.md'));
 });
 
 gulp.task("release", function(){

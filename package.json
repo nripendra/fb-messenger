@@ -29,6 +29,7 @@
     "gulp": "^3.9.0",
     "gulp-babel": "^5.2.0",
     "gulp-batch-replace": "0.0.0",
+    "gulp-conventional-changelog": "^0.7.0",
     "gulp-electron": "0.0.9",
     "gulp-git": "^1.6.0",
     "gulp-inject": "^3.0.0",
