@@ -1,3 +1,63 @@
+#Release :0.2.0-alpha.4<a name="0.2.0-alpha.4"></a>
+# [0.2.0-alpha.4](https://github.com/nripendra/fb-messenger/compare/0.2.0-alpha.3...v0.2.0-alpha.4) (2015-11-28)
+
+
+### Bug Fixes
+
+* gulp.insert doesn't seem to work with memory stream ([94a55e1](https://github.com/nripendra/fb-messenger/commit/94a55e1))
+
+
+
+#Release :0.2.0-alpha.4<a name="0.2.0-alpha.4"></a>
+# [0.2.0-alpha.4](https://github.com/nripendra/fb-messenger/compare/0.2.0-alpha.3...v0.2.0-alpha.4) (2015-11-28)
+
+
+### Bug Fixes
+
+* gulp.insert doesn't seem to work with memory stream ([94a55e1](https://github.com/nripendra/fb-messenger/commit/94a55e1))
+
+
+
+#Release :0.2.0-alpha.4<a name="0.2.0-alpha.4"></a>
+# [0.2.0-alpha.4](https://github.com/nripendra/fb-messenger/compare/0.2.0-alpha.3...v0.2.0-alpha.4) (2015-11-28)
+
+
+### Bug Fixes
+
+* gulp.insert doesn't seem to work with memory stream ([94a55e1](https://github.com/nripendra/fb-messenger/commit/94a55e1))
+
+
+
+#Release :0.2.0-alpha.4<a name="0.2.0-alpha.4"></a>
+# [0.2.0-alpha.4](https://github.com/nripendra/fb-messenger/compare/0.2.0-alpha.3...v0.2.0-alpha.4) (2015-11-28)
+
+
+### Bug Fixes
+
+* gulp.insert doesn't seem to work with memory stream ([94a55e1](https://github.com/nripendra/fb-messenger/commit/94a55e1))
+
+
+
+#Release :0.2.0-alpha.4<a name="0.2.0-alpha.4"></a>
+# [0.2.0-alpha.4](https://github.com/nripendra/fb-messenger/compare/0.2.0-alpha.3...v0.2.0-alpha.4) (2015-11-28)
+
+
+### Bug Fixes
+
+* gulp.insert doesn't seem to work with memory stream ([94a55e1](https://github.com/nripendra/fb-messenger/commit/94a55e1))
+
+
+
+#Release :0.2.0-alpha.4<a name="0.2.0-alpha.4"></a>
+# [0.2.0-alpha.4](https://github.com/nripendra/fb-messenger/compare/0.2.0-alpha.3...v0.2.0-alpha.4) (2015-11-28)
+
+
+### Bug Fixes
+
+* gulp.insert doesn't seem to work with memory stream ([94a55e1](https://github.com/nripendra/fb-messenger/commit/94a55e1))
+
+
+
 <a name="0.2.0-alpha.3"></a>
 # [0.2.0-alpha.3](https://github.com/nripendra/fb-messenger/compare/0.2.0-alpha.2...v0.2.0-alpha.3) (2015-11-28)
 
