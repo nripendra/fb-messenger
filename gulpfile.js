@@ -6,6 +6,7 @@ var babel = require("gulp-babel"),
     Config = require('./gulpfile.config'),
     del = require('del'),
     electron = require('gulp-electron'),
+    git = require('gulp-git'),
     glob = require('glob'),
     gulp = require('gulp'),
     inject = require('gulp-inject'),
@@ -299,6 +300,11 @@ gulp.task('package-win32', ['build'], function(cb){
 
 gulp.task('run',  function(cb) {
     return runSequence('atom-run', 'watch', cb);
+});
+
+gulp.task("release", function(){
+    git.status({args: "--porcelain"}, function(err, stdout){
+    });
 });
 
 gulp.task('default', ['build']);
