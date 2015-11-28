@@ -315,6 +315,9 @@ gulp.task("release", function(){
                 } else {
                     git.push("origin", "master", {args: "--follow-tags"}, function (err) {
                         if (err) throw err;
+                        git.checkout("release-" + packageJson.version, {args: "-b"}, function(err) {
+                            if (err) throw err;
+                        });
                     });
                 }
             });
