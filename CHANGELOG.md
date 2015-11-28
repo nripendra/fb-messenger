@@ -1,3 +1,9 @@
+<a name="0.2.0-alpha.5"></a>
+# [0.2.0-alpha.5](https://github.com/nripendra/fb-messenger/compare/0.2.0-alpha.4...v0.2.0-alpha.5) (2015-11-28)
+
+
+
+
 <a name="0.2.0-alpha.4"></a>
 # [0.2.0-alpha.4](https://github.com/nripendra/fb-messenger/compare/0.2.0-alpha.3...v0.2.0-alpha.4) (2015-11-28)
 
