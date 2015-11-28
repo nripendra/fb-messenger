@@ -303,10 +303,8 @@ gulp.task('run',  function(cb) {
 });
 
 gulp.task("release", function(){
-    git.status({args: "--porcelain"}, function(err, stdout){
-        if(stdout != ""){
-            throw "Please commit/undo all your changes before release";
-        }
+    git.checkout("master", function(err){
+        if(err)throw err;
     });
 });
 
