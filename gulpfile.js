@@ -309,8 +309,9 @@ gulp.task("release", function(){
             if (err) throw err;
             git.tag(packageJson.version, "Preparing release " + packageJson.version, {args: "-a"}, function (err) {
                 if (err) {
-                    git.reset("HEAD~1", {args: "--hard"});
-                    throw err;
+                    git.reset("HEAD~1", {args: "--hard"}, function(){
+                        throw err;    
+                    });
                 }
             });
         });
