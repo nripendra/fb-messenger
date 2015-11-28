@@ -144,7 +144,7 @@ export default class ChatStore extends Store {
         if(timer === null) {
             this.chatService.sendTypingIndicator(threadID).then((end: Function) => {
                 this.typingEnders[threadID] = end;
-                this.typingTimers[threadID] = setTimeout(function(){
+                this.typingTimers[threadID] = setTimeout(() => {
                     this.typingTimers[threadID] = null;
                     this.endTypingIndicator(threadID);
                 }, 30000);
