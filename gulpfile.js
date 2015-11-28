@@ -305,7 +305,9 @@ gulp.task('run', function (cb) {
 });
 
 gulp.task('release-notes', function () {
-    return gulp.src("./release-notes.md").pipe(conventionalChangelog({
+    return gulp.src("./release-notes.md").pipe(insert.transform(function (contents, file) {
+        return "";
+    })).pipe(conventionalChangelog({
         preset: 'angular',
         releaseCount: 1
     }))
@@ -314,9 +316,11 @@ gulp.task('release-notes', function () {
 });
 
 gulp.task("change-logs", function () {
-    return gulp.src("./CHANGELOG.md").pipe(conventionalChangelog({
+    return gulp.src("./CHANGELOG.md", {
+        read: false
+    }).pipe(conventionalChangelog({
         preset: 'angular',
-        releaseCount: 1
+        releaseCount: 0
     }))
         .pipe(gulp.dest('./'));
 });
