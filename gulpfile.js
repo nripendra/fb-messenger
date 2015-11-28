@@ -6,6 +6,7 @@ var babel = require("gulp-babel"),
     Config = require('./gulpfile.config'),
     del = require('del'),
     electron = require('gulp-electron'),
+    git = require('gulp-git'),
     glob = require('glob'),
     gulp = require('gulp'),
     inject = require('gulp-inject'),
@@ -54,6 +55,7 @@ gulp.task('compile-test', ['copy-jsx-test'], function(){
 
 gulp.task('test', ['compile-test'], function(){
   process.env.NODE_ENV = 'development';
+  global.electronRequire = require;
   return gulp.src('./tests/out/tests/specs/**/*.js')
       .pipe(jasmine({includeStackTrace: true, reporter: new SpecReporter()}));
 });
@@ -145,7 +147,7 @@ gulp.task('browserify-copy_node_modules', function () {
     "har-validator", "has-unicode", "hawk", "hoek", "htmlparser2", "http-signature", 
     "inherits", "isarray", "is-my-json-valid", "is-property", "is-typedarray", "isstream", 
     "jodid25519", "jsbn", "json-schema", "json-stringify-safe", "jsonpointer", "jsprim", 
-    "lodash", "lodash._basetostring", "lodash._createpadding", "lodash.pad", "lodash.padleft", "lodash.padright", "lodash.repeat", 
+    "lodash", "lodash._basetostring", "lodash._createpadding", "lodash._getnative", "lodash.debounce", "lodash.pad", "lodash.padleft", "lodash.padright", "lodash.repeat", 
     "mime-db", "mime-types", 
     "node-uuid", "npmlog", "nth-check", 
     "oauth-sign", 
@@ -298,6 +300,26 @@ gulp.task('package-win32', ['build'], function(cb){
 
 gulp.task('run',  function(cb) {
     return runSequence('atom-run', 'watch', cb);
+});
+
+gulp.task("release", function(){
+    git.checkout("master", function(err){
+        if(err)throw err;
+        git.merge('develop', function (err) {
+            if (err) throw err;
+            git.tag(packageJson.version, "Preparing release " + packageJson.version, {args: "-a"}, function (err) {
+                if (err) {
+                    git.reset("HEAD~1", {args: "--hard"}, function(){
+                        throw err;    
+                    });
+                } else {
+                    git.push("origin", "master", {args: "--follow-tags"}, function (err) {
+                        if (err) throw err;
+                    });
+                }
+            });
+        });
+    });
 });
 
 gulp.task('default', ['build']);

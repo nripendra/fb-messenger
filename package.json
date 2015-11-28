@@ -7,7 +7,7 @@
   "bugs": {
     "url": "https://github.com/nripendra/fb-messenger/issues"
   },
-  "version": "0.1.0",
+  "version": "0.2.0-alpha.1",
   "description": "facebook messenger",
   "main": "index.js",
   "scripts": {
@@ -30,6 +30,7 @@
     "gulp-babel": "^5.2.0",
     "gulp-batch-replace": "0.0.0",
     "gulp-electron": "0.0.9",
+    "gulp-git": "^1.6.0",
     "gulp-inject": "^3.0.0",
     "gulp-inno": "0.0.7",
     "gulp-jasmine": "^2.0.1",

@@ -4,6 +4,8 @@
 
 /// <reference path="../../src/appstores.ts" />
 
+/// <reference path="../../src/electronRequire.ts" />
+
 /// <reference path="../../src/index.ts" />
 
 /// <reference path="../../src/stdio-redirect.ts" />
@@ -36,17 +38,23 @@
 
 /// <reference path="../../src/components/message-item.tsx" />
 
+/// <reference path="../../src/components/search-field.tsx" />
+
 /// <reference path="../../src/components/send-message-text-field.tsx" />
 
 /// <reference path="../../src/components/typing-indicator.tsx" />
 
 /// <reference path="../../src/decorators/connectToStores.tsx" />
 
+/// <reference path="../../src/decorators/sortAndFilterFriendList.tsx" />
+
 /// <reference path="../../src/services/auto-updateservice.ts" />
 
 /// <reference path="../../src/services/chatservice.ts" />
 
 /// <reference path="../../src/services/loginservice.ts" />
+
+/// <reference path="../../src/services/string-score.ts" />
 
 /// <reference path="../../src/stores/auto-updaterstore.ts" />
 

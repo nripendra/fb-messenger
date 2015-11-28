@@ -123,6 +123,21 @@ export default class ChatService {
             });
         }.bind(this));
     }
+    
+    sendTypingIndicator(threadId: string): Promise<any> {
+        return new Promise<any>(function(resolve: Function, reject: Function) {
+            console.log("chatservice sendTypingIndicator: %s", threadId);
+            this.api.sendTypingIndicator(threadId, function(err: any, end: Function) {
+                if (err) {
+                    console.log("chatservice sendTypingIndicator error %o", err);
+                    reject(err);
+                } else {
+                    console.log("chatservice sendTypingIndicator sent");
+                    resolve(end);
+                }
+            });
+        }.bind(this));
+    }
 
     listen() {
         var api = this.api;

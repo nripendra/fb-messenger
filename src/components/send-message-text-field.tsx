@@ -24,12 +24,41 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
         super();
         this.props = props;
 		this.handleSendMessage = this.handleSendMessage.bind(this);
+		this.handleTextChange = this.handleTextChange.bind(this);
+		this.handleOnBlur = this.handleOnBlur.bind(this);
+		this.handleEnterKey = this.handleEnterKey.bind(this);
     }
 
+	typingTimer: any = null;
+	handleTextChange() {
+		var message = (this.refs["messageField"] as any).getValue() || "";
+		var threadID = this.props.currentFriend.userID;
+		
+		if(message.length > 0) {
+			ChatActions.sendTypingIndicator(threadID);
+		} else {
+			ChatActions.endTypingIndicator(threadID);
+		}
+	}
+	
+	handleEnterKey(event: any) {
+		if(event.shiftKey == false){
+			event.preventDefault();
+			this.handleSendMessage();
+		}
+	}
+	
+	handleOnBlur() {
+		var threadID = this.props.currentFriend.userID;
+		this.props.onTextFieldBlur();
+		ChatActions.endTypingIndicator(threadID);
+	}
+	
 	handleSendMessage() {
 		let threadID = this.props.currentFriend.userID;
 		let message = { senderID: this.props.currentUser.userID, body: (this.refs["messageField"] as any).getValue() };
 		ChatActions.sendMessage(threadID, message);
+		ChatActions.endTypingIndicator(threadID);
 		(this.refs["messageField"] as any).clearValue();
 	}
 
@@ -37,8 +66,10 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
 		return (<Hbox style={{ margin: 0, padding: 0 }}>
 					<TextField
 						ref="messageField"
+						onEnterKeyDown={this.handleEnterKey}
 						onFocus={this.props.onTextFieldFocus}
-						onBlur={this.props.onTextFieldBlur}
+						onBlur={this.handleOnBlur}
+						onChange={this.handleTextChange}
 						hintText="Write a message..."
 						multiLine={true}
 						rows={1}

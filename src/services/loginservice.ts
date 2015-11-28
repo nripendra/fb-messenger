@@ -1,6 +1,4 @@
-let electronRequire: Function = (global as any).electronRequire || function () {
-  
-};
+import electronRequire from "../electronRequire";
 
 var login = electronRequire("facebook-chat-api");
 
