@@ -304,10 +304,18 @@ gulp.task('run',  function(cb) {
     return runSequence('atom-run', 'watch', cb);
 });
 
-gulp.task('changes', function () {
+gulp.task('release-notes', function () {
   return conventionalChangelog({
     preset: 'angular',
     releaseCount: 1
+  })
+    .pipe(fs.createWriteStream('Release-notes.md'));
+});
+
+gulp.task("change-logs", function () {
+  return conventionalChangelog({
+    preset: 'angular',
+    releaseCount: 0
   })
     .pipe(fs.createWriteStream('CHANGELOG.md'));
 });
@@ -315,21 +323,39 @@ gulp.task('changes', function () {
 gulp.task("release", function(){
     git.checkout("master", function(err){
         if(err)throw err;
-        git.merge('develop', function (err) {
-            if (err) throw err;
-            git.tag(packageJson.version, "Preparing release " + packageJson.version, {args: "-a"}, function (err) {
-                if (err) {
-                    git.reset("HEAD~1", {args: "--hard"}, function(){
-                        throw err;    
+        runSequence(["release-notes", "change-logs"], function(){
+            git.commit('Generated release-notes and change-logs', {args: '-A'});
+            git.merge('develop', function (err) {
+                if (err) throw err;
+                fs.readFile("./Release-notes.md", 'utf8', function(err, data) {
+                    if (err) throw err;
+                    git.tag(packageJson.version, data, {args: "-a"}, function (err) {
+                        if (err) {
+                            git.reset("HEAD~1", {args: "--hard"}, function(){
+                                throw err;    
+                            });
+                        } else {
+                            git.push("origin", "master", {args: "--follow-tags"}, function (err) {
+                                if (err) throw err;
+                                git.checkout("develop", function(err) {
+                                    if (err) throw err;
+                                    git.merge("master", function(err){
+                                        if (err) throw err;
+                                        git.push("origin", "develop", function(err){
+                                            if (err) throw err;
+                                            git.checkout("master", function(err) {
+                                                if (err) throw err;
+                                                git.checkout("release-" + packageJson.version, {args: "-b"}, function(err) {
+                                                    if (err) throw err;
+                                                });
+                                            });
+                                        })
+                                    });
+                                });
+                            });
+                        }
                     });
-                } else {
-                    git.push("origin", "master", {args: "--follow-tags"}, function (err) {
-                        if (err) throw err;
-                        git.checkout("release-" + packageJson.version, {args: "-b"}, function(err) {
-                            if (err) throw err;
-                        });
-                    });
-                }
+                });
             });
         });
     });
