@@ -314,11 +314,11 @@ gulp.task('release-notes', function () {
 });
 
 gulp.task("change-logs", function () {
-    return conventionalChangelog({
+    return gulp.src("./CHANGELOG.md").pipe(conventionalChangelog({
         preset: 'angular',
-        releaseCount: 0
-    })
-    .pipe(fs.createWriteStream('CHANGELOG.md'));
+        releaseCount: 1
+    }))
+    .pipe(gulp.dest('./'));
 });
 
 gulp.task("release", function () {
