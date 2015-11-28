@@ -305,6 +305,12 @@ gulp.task('run',  function(cb) {
 gulp.task("release", function(){
     git.checkout("master", function(err){
         if(err)throw err;
+        git.merge('develop', function (err) {
+            if (err) throw err;
+            git.tag(packageJson.version, "Preparing release " + packageJson.version, {args: "-a"}, function (err) {
+                if (err) throw err;
+            });
+        });
     });
 });
 
