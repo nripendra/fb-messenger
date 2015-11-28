@@ -26,6 +26,7 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
 		this.handleSendMessage = this.handleSendMessage.bind(this);
 		this.handleTextChange = this.handleTextChange.bind(this);
 		this.handleOnBlur = this.handleOnBlur.bind(this);
+		this.handleEnterKey = this.handleEnterKey.bind(this);
     }
 
 	typingTimer: any = null;
@@ -37,6 +38,13 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
 			ChatActions.sendTypingIndicator(threadID);
 		} else {
 			ChatActions.endTypingIndicator(threadID);
+		}
+	}
+	
+	handleEnterKey(event: any) {
+		if(event.shiftKey == false){
+			event.preventDefault();
+			this.handleSendMessage();
 		}
 	}
 	
@@ -58,6 +66,7 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
 		return (<Hbox style={{ margin: 0, padding: 0 }}>
 					<TextField
 						ref="messageField"
+						onEnterKeyDown={this.handleEnterKey}
 						onFocus={this.props.onTextFieldFocus}
 						onBlur={this.handleOnBlur}
 						onChange={this.handleTextChange}
