@@ -13,7 +13,7 @@ var babel = require("gulp-babel"),
     gulp = require('gulp'),
     inject = require('gulp-inject'),
     inno = require('gulp-inno'),
-    //insert = require('gulp-insert'),
+    insert = require('gulp-insert'),
     jasmine = require('gulp-jasmine'),
     less = require('gulp-less'),
     plumber = require('gulp-plumber'),
@@ -309,7 +309,8 @@ gulp.task('release-notes', function () {
         preset: 'angular',
         releaseCount: 1
     })
-        .pipe(fs.createWriteStream('release-notes.md'));
+    .pipe(insert.prepend('#Release :' + packageJson.version))
+    .pipe(fs.createWriteStream('release-notes.md'));
 });
 
 gulp.task("change-logs", function () {
@@ -317,7 +318,7 @@ gulp.task("change-logs", function () {
         preset: 'angular',
         releaseCount: 0
     })
-        .pipe(fs.createWriteStream('CHANGELOG.md'));
+    .pipe(fs.createWriteStream('CHANGELOG.md'));
 });
 
 gulp.task("release", function () {
@@ -326,34 +327,36 @@ gulp.task("release", function () {
         git.merge('develop', function (err) {
             if (err) throw err;
             runSequence(["release-notes", "change-logs"], function () {
-                git.commit('Generated release-notes and change-logs', { args: '-A' });
-                fs.readFile("./Release-notes.md", 'utf8', function (err, data) {
+                git.commit('Generated release-notes and change-logs', { args: '-A' }, function (err) {
                     if (err) throw err;
-                    git.exec({ args: "tag -a " + packageJson.version + " -F ./release-notes.md" }, function (err, stdout) {
-                        if (err) {
-                            git.reset("HEAD~1", { args: "--hard" }, function () {
-                                throw err;
-                            });
-                        } else {
-                            git.push("origin", "master", { args: "--follow-tags" }, function (err) {
-                                if (err) throw err;
-                                git.checkout("develop", function (err) {
+                    fs.readFile("./Release-notes.md", 'utf8', function (err, data) {
+                        if (err) throw err;
+                        git.exec({ args: "tag -a " + packageJson.version + " -F ./release-notes.md" }, function (err, stdout) {
+                            if (err) {
+                                git.reset("HEAD~1", { args: "--hard" }, function () {
+                                    throw err;
+                                });
+                            } else {
+                                git.push("origin", "master", { args: "--follow-tags" }, function (err) {
                                     if (err) throw err;
-                                    git.merge("master", function (err) {
+                                    git.checkout("develop", function (err) {
                                         if (err) throw err;
-                                        git.push("origin", "develop", function (err) {
+                                        git.merge("master", function (err) {
                                             if (err) throw err;
-                                            git.checkout("master", function (err) {
+                                            git.push("origin", "develop", function (err) {
                                                 if (err) throw err;
-                                                git.checkout("release-" + packageJson.version, { args: "-b" }, function (err) {
+                                                git.checkout("master", function (err) {
                                                     if (err) throw err;
+                                                    git.checkout("release-" + packageJson.version, { args: "-b" }, function (err) {
+                                                        if (err) throw err;
+                                                    });
                                                 });
-                                            });
-                                        })
+                                            })
+                                        });
                                     });
                                 });
-                            });
-                        }
+                            }
+                        });
                     });
                 });
             });
