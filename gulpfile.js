@@ -214,7 +214,7 @@ gulp.task('atom-kill', function (cb) {
     cb();
 });
 
-gulp.task('atom-clean', ['atom-kill'], function (cb) {
+gulp.task('atom-clean', function (cb) {
     return del('./electron/build/**/*.*', cb);
 });
 
@@ -246,28 +246,34 @@ gulp.task('atom-create', ['atom-clean', 'browserify', 'copy-static'], function (
             }
         }))
         .pipe(gulp.dest(""));
-    // return atom({
-    //     srcPath: './out/compile',
-    //     releasePath: './electron/build',
-    //     cachePath: './electron/cache',
-    //     version: electronVersion,
-    //     rebuild: false,
-    //     asar: true,
-    //     platforms: ['win32-ia32']
-    // });
+});
+
+gulp.task("atom-copy", function () {
+    var curOutputPath = "./electron/build/" + electronVersion + "/win32-ia32/**/*";
+    var dest = "./electron/fb-messenger/" + packageJson.version;
+    gulp.src(curOutputPath).pipe(gulp.dest(dest));
+    gulp.src("./restart.bat").pipe(gulp.dest("./electron/fb-messenger/"));
 });
 
 gulp.task('atom', ['less', '3rd-party-assets'], function (cb) {
     return runSequence('atom-clean', 'atom-create', cb);
 });
 
-gulp.task('atom-run', ['atom'], function (cb) {
-    var child = spawn('./electron/build/' + electronVersion + '/win32-ia32/fb-messenger.exe', []);
-    cb();
+gulp.task('atom-run', function (cb) {
+    runSequence('atom-kill', 'atom', 'atom-copy', function () {
+        setTimeout(function () {
+            var child = spawn("./electron/fb-messenger/" + packageJson.version + "/fb-messenger.exe", [], { detached: true });
+            child.on('error', function (err) {
+                console.log('Failed to start child process.%o', err);
+            });
+            child.unref();
+            cb();
+        }, 1500);
+    });
 });
 
 gulp.task('watch', function () {
-    gulp.watch([config.allTypeScript, config.source + '**/*.jsx'], ['run']);
+    gulp.watch([config.allTypeScript, config.source + '**/*.jsx'], ['atom-run']);
 });
 
 gulp.task('inno-script-transform', function () {
