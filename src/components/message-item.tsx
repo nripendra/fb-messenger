@@ -25,10 +25,15 @@ export class MessageContent extends React.Component<MessageContentProps, any> {
 	
 	render() {
 		if((this.props.message.attachments || []).length == 0) {
-			let justify = {'textAlign':'justify'};
-			return (<div className={this.props.className} style={justify} >
-				<Emojify messageText={this.props.message.body} />
-			</div>);
+			if(this.props.message.sticker) {
+				return <div style={this.getStickerStyle(this.props.message.sticker)}>
+				</div>;
+			} else {
+				let justify = {'textAlign':'justify'};
+				return (<div className={this.props.className} style={justify} >
+					<Emojify messageText={this.props.message.body} />
+				</div>);
+			}
 		} else {
 			return (<div>
 				{this.props.message.attachments.map((attachment:any) => {
@@ -40,6 +45,16 @@ export class MessageContent extends React.Component<MessageContentProps, any> {
 				})}
 			</div>);
 		}
+	}
+	
+	getStickerStyle(stickerID: number) {
+		// To-do: store this map externally, making stickers pluggable..
+		var stickers = {
+			"369239263222822" : {width: 35, height: 35, backgroundSize: "35px 35px", backgroundImage: "url(https://fbstatic-a.akamaihd.net/rsrc.php/ya/r/FwHVs2eE5cr.svg)", transition: "all 0.5s" },
+			"369239343222814" : {width: 84, height: 84, backgroundSize: "84px 84px", backgroundImage: "url(https://fbstatic-a.akamaihd.net/rsrc.php/ya/r/FwHVs2eE5cr.svg)", transition: "all 0.5s" },
+			"369239383222810" : {width: 120, height: 120, backgroundSize: "120px 120px", backgroundImage: "url(https://fbstatic-a.akamaihd.net/rsrc.php/ya/r/FwHVs2eE5cr.svg)", transition: "all 0.5s" }
+		};
+		return stickers[stickerID];
 	}
 }
 
