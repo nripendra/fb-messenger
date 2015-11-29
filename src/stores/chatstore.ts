@@ -171,16 +171,18 @@ export default class ChatStore extends Store {
     
     finalizeLikeSticker(payload: any) {
         var {threadID, stickerID} = payload;
-        var message = this.messages[threadID].find(t => t.messageID == this.likeStickerTrackerId);
-        if(message != null) {
-            this.chatService.sendMessage(message, threadID).then((returnMessage: any) => {
-                console.log("like sticker sent: %o, %s", returnMessage, threadID);
-                message.messageID = returnMessage.messageID;
-            });
+        if(this.likeStickerTrackerId != "") {
+            var message = this.messages[threadID].find(t => t.messageID == this.likeStickerTrackerId);
+            if(message != null) {
+                this.chatService.sendMessage(message, threadID).then((returnMessage: any) => {
+                    console.log("like sticker sent: %o, %s", returnMessage, threadID);
+                    message.messageID = returnMessage.messageID;
+                });
+            }
+            console.log("message after finalizeLikeSticker %o", this.messages[threadID]);
+            this.likeStickerTrackerId = ""; 
+            this.emit("change");
         }
-        console.log("message after finalizeLikeSticker %o", this.messages[threadID]);
-        this.likeStickerTrackerId = ""; 
-        this.emit("change");
     }
     
     likeStickerTrackerId = "";
@@ -197,6 +199,7 @@ export default class ChatStore extends Store {
         if(stickerID == 0){
             console.log("chatstore: enqueueLikeSticker, remove sticker %s,%s", threadID, stickerID);
             this.messages[threadID] = this.messages[threadID].filter(t => t.messageID != this.likeStickerTrackerId);
+            this.likeStickerTrackerId = "";
             this.emit("change");
             return;
         }

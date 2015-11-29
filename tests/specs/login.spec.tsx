@@ -496,6 +496,144 @@ describe("fb-messenger", () => {
         });
     });
     
+    describe("send giant like", ()=>{
+        it("should dispatch enqueueLikeSticker message when pressing mouse button down upon the like icon", () => {
+            var api = {
+                getCurrentUserID: ()=> { return 10;},
+                getUserInfo: ()=> { return 10;},
+                markAsRead: ()=> {return;},
+                getFriendsList: ()=> {return;},
+                setOptions: ()=> {return;},
+                getOnlineUsers: ()=> {return;},
+                sendMessage: ()=>{return;},
+                sendTypingIndicator: ()=>{return;}
+            };
+           AppStores.chatStore.loadFriendList(api);
+
+           spyOn(ChatActions, "enqueueLikeSticker").and.callFake(function() {
+                return;// noop
+           });
+           var sendMessageTextField = ReactDom.render(<SendMessageTextField 
+                                                            currentFriend={{userID: '1', profilePicture: 'http://propic1.com/'}} 
+                                                            currentUser={{userID:'10'}}
+                                                            onTextFieldFocus={()=>{}}
+                                                            onTextFieldBlur={()=>{}} />, 
+                                                            document.getElementById('fb-messenger'));
+           sendMessageTextField.handleLikeButtonMouseDown();
+           
+           expect(ChatActions.enqueueLikeSticker).toHaveBeenCalled();
+        });
+        
+        it("should dispatch multiple enqueueLikeSticker messages when pressing mouse button down upon the like icon continiously", (done: Function) => {
+            var api = {
+                getCurrentUserID: ()=> { return 10;},
+                getUserInfo: ()=> { return 10;},
+                markAsRead: ()=> {return;},
+                getFriendsList: ()=> {return;},
+                setOptions: ()=> {return;},
+                getOnlineUsers: ()=> {return;},
+                sendMessage: ()=>{return;},
+                sendTypingIndicator: ()=>{return;}
+            };
+           AppStores.chatStore.loadFriendList(api);
+
+           spyOn(ChatActions, "enqueueLikeSticker").and.callFake(function() {
+                return;// noop
+           });
+           var sendMessageTextField = ReactDom.render(<SendMessageTextField 
+                                                            currentFriend={{userID: '1', profilePicture: 'http://propic1.com/'}} 
+                                                            currentUser={{userID:'10'}}
+                                                            onTextFieldFocus={()=>{}}
+                                                            onTextFieldBlur={()=>{}} />, 
+                                                            document.getElementById('fb-messenger'));
+           sendMessageTextField.handleLikeButtonMouseDown();
+           
+           setTimeout(() =>{
+                expect((ChatActions.enqueueLikeSticker as any).calls.count()).toBeGreaterThan(2);
+                done();
+           }, 1600);
+        });
+        
+        it("should dispatch finalizeLikeSticker message when mouse button is released upon the like icon", () => {
+            var api = {
+                getCurrentUserID: ()=> { return 10;},
+                getUserInfo: ()=> { return 10;},
+                markAsRead: ()=> {return;},
+                getFriendsList: ()=> {return;},
+                setOptions: ()=> {return;},
+                getOnlineUsers: ()=> {return;},
+                sendMessage: ()=>{return;},
+                sendTypingIndicator: ()=>{return;}
+            };
+           AppStores.chatStore.loadFriendList(api);
+
+           spyOn(ChatActions, "finalizeLikeSticker").and.callFake(function() {
+                return;// noop
+           });
+           var sendMessageTextField = ReactDom.render(<SendMessageTextField 
+                                                            currentFriend={{userID: '1', profilePicture: 'http://propic1.com/'}} 
+                                                            currentUser={{userID:'10'}}
+                                                            onTextFieldFocus={()=>{}}
+                                                            onTextFieldBlur={()=>{}} />, 
+                                                            document.getElementById('fb-messenger'));
+           sendMessageTextField.handleLikeButtonMouseUp();
+           
+           expect(ChatActions.finalizeLikeSticker).toHaveBeenCalled();
+        });
+        
+        describe("enqueueLikeSticker", ()=> {
+            it("should track the sticker message", () => {
+                //Arrange
+                AppStores.chatStore.localGUID = 0;
+                AppStores.chatStore.likeStickerTrackerId = "";
+                AppStores.chatStore.messages["1"] = Array<any>();
+                //Act
+                AppStores.chatStore.enqueueLikeSticker({threadID: "1", stickerID: 369239263222822});
+                
+                //Assert
+                expect(AppStores.chatStore.likeStickerTrackerId).toBe("sending-inprogress-0");
+                expect(AppStores.chatStore.localGUID).toBe(1);
+                expect(AppStores.chatStore.messages["1"].length).toBe(1);
+                expect(AppStores.chatStore.messages["1"][0].threadID).toBe("1");
+                expect(AppStores.chatStore.messages["1"][0].sticker).toBe(369239263222822);
+            });
+            
+            it("should update the stickerID", () => {
+                //Arrange
+                AppStores.chatStore.localGUID = 0;
+                AppStores.chatStore.likeStickerTrackerId = "";
+                AppStores.chatStore.messages["1"] = Array<any>();
+                AppStores.chatStore.enqueueLikeSticker({threadID: "1", stickerID: 369239263222822});
+
+                //Act
+                AppStores.chatStore.enqueueLikeSticker({threadID: "1", stickerID: 369239343222814});
+                
+                //Assert
+                expect(AppStores.chatStore.likeStickerTrackerId).toBe("sending-inprogress-0");
+                expect(AppStores.chatStore.localGUID).toBe(1);
+                expect(AppStores.chatStore.messages["1"].length).toBe(1);
+                expect(AppStores.chatStore.messages["1"][0].threadID).toBe("1");
+                expect(AppStores.chatStore.messages["1"][0].sticker).toBe(369239343222814);
+            });
+            
+            it("should remove the sticker message if stickerID is 0", () => {
+                //Arrange
+                AppStores.chatStore.localGUID = 0;
+                AppStores.chatStore.likeStickerTrackerId = "";
+                AppStores.chatStore.messages["1"] = Array<any>();
+                AppStores.chatStore.enqueueLikeSticker({threadID: "1", stickerID: 369239263222822});
+
+                //Act
+                AppStores.chatStore.enqueueLikeSticker({threadID: "1", stickerID: 0});
+                
+                //Assert
+                expect(AppStores.chatStore.likeStickerTrackerId).toBe("");
+                expect(AppStores.chatStore.localGUID).toBe(1);
+                expect(AppStores.chatStore.messages["1"].length).toBe(0);
+            });
+        });
+    });
+    
     beforeEach(function() {
     
         (global as any).document = jsdom.jsdom('<!doctype html><html><body><div id="fb-messenger"></div></body></html>');
