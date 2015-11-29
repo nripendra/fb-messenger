@@ -29,5 +29,13 @@ export default {
     filterFriendList(filterText: string){
         console.log("chatAction: filterFriendList : %s", filterText);
         dispatcher.dispatch("filterFriendList", filterText);
+    },
+    enqueueLikeSticker(threadID: string, stickerID: number){
+        console.log("chatAction: enqueueLikeSticker : %s, %d", threadID, stickerID);
+        dispatcher.dispatch("enqueueLikeSticker", {threadID, stickerID});
+    },
+    finalizeLikeSticker(threadID: string, stickerID: number){
+        console.log("chatAction: finalizeLikeSticker : %s, %d", threadID, stickerID);
+        dispatcher.dispatch("finalizeLikeSticker", {threadID, stickerID});
     }
 };
