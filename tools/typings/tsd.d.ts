@@ -6,3 +6,4 @@
 /// <reference path="semver/semver.d.ts" />
 /// <reference path="delorean/delorean.d.ts" />
 /// <reference path="./fbMessengerApp.d.ts" />
+/// <reference path="./array/array.d.ts" />

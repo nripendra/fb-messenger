@@ -27,33 +27,70 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
 		this.handleTextChange = this.handleTextChange.bind(this);
 		this.handleOnBlur = this.handleOnBlur.bind(this);
 		this.handleEnterKey = this.handleEnterKey.bind(this);
+		this.handleLikeButtonMouseDown = this.handleLikeButtonMouseDown.bind(this);
+		this.handleLikeButtonMouseUp = this.handleLikeButtonMouseUp.bind(this);
     }
 
-	typingTimer: any = null;
+	mouseDownTimer: any = null;
+	likeSticker:number = 0;
+	handleLikeButtonMouseDown() {
+		var threadID = this.props.currentFriend.userID;
+		var stickers = [369239263222822,// 35
+			369239343222814,// 84
+			369239383222810// 120
+		];
+		var i = 0;
+		var interval = 800;
+		this.likeSticker = stickers[i];
+		console.log("sticker...%d", this.likeSticker);
+		ChatActions.enqueueLikeSticker(threadID, this.likeSticker);
+		this.mouseDownTimer = setInterval(() => {
+			i++;
+			if (i > 2) {
+				i = 0;
+				this.likeSticker = 0;
+				clearInterval(this.mouseDownTimer);
+				console.log("sticker...%d", this.likeSticker);
+				ChatActions.enqueueLikeSticker(threadID, this.likeSticker);
+			} else {
+				this.likeSticker = stickers[i];
+				console.log("sticker...%d", this.likeSticker);
+				ChatActions.enqueueLikeSticker(threadID, this.likeSticker);
+			}
+		}, interval);
+	}
+
+	handleLikeButtonMouseUp() {
+		var threadID = this.props.currentFriend.userID;
+		clearInterval(this.mouseDownTimer);
+		console.log("final sticker...%d", this.likeSticker);
+		ChatActions.finalizeLikeSticker(threadID, this.likeSticker);
+	}
+
 	handleTextChange() {
 		var message = (this.refs["messageField"] as any).getValue() || "";
 		var threadID = this.props.currentFriend.userID;
-		
-		if(message.length > 0) {
+
+		if (message.length > 0) {
 			ChatActions.sendTypingIndicator(threadID);
 		} else {
 			ChatActions.endTypingIndicator(threadID);
 		}
 	}
-	
+
 	handleEnterKey(event: any) {
-		if(event.shiftKey == false){
+		if (event.shiftKey == false) {
 			event.preventDefault();
 			this.handleSendMessage();
 		}
 	}
-	
+
 	handleOnBlur() {
 		var threadID = this.props.currentFriend.userID;
 		this.props.onTextFieldBlur();
 		ChatActions.endTypingIndicator(threadID);
 	}
-	
+
 	handleSendMessage() {
 		let threadID = this.props.currentFriend.userID;
 		let message = { senderID: this.props.currentUser.userID, body: (this.refs["messageField"] as any).getValue() };
@@ -76,6 +113,7 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
 						rowsMax={2}
 						style={{ flex: 2 }}></TextField>
 					<IconButton onClick={this.handleSendMessage} ><FontIcon className="fa fa-paper-plane fa-2" /></IconButton>
+					<IconButton onMouseDown={this.handleLikeButtonMouseDown} onMouseUp={this.handleLikeButtonMouseUp} ><FontIcon className="fa fa-thumbs-o-up fa-2" /></IconButton>
 			</Hbox>);
 	}
 }
