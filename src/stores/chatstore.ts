@@ -34,7 +34,9 @@ export default class ChatStore extends Store {
             "sendMessage": "sendMessage",
             "sendTypingIndicator": "sendTypingIndicator",
             "endTypingIndicator": "endTypingIndicator",
-            "filterFriendList": "filterFriendList"
+            "filterFriendList": "filterFriendList",
+            "enqueueLikeSticker": "enqueueLikeSticker",
+            "finalizeLikeSticker": "finalizeLikeSticker"
         };
     }
 
@@ -164,6 +166,53 @@ export default class ChatStore extends Store {
     
     filterFriendList(friendListFilterText: string) {
         this.friendListFilterText = friendListFilterText;
+        this.emit("change");
+    }
+    
+    finalizeLikeSticker(payload: any) {
+        var {threadID, stickerID} = payload;
+        var message = this.messages[threadID].find(t => t.messageID == this.likeStickerTrackerId);
+        if(message != null) {
+            this.chatService.sendMessage(message, threadID).then((returnMessage: any) => {
+                console.log("like sticker sent: %o, %s", returnMessage, threadID);
+                message.messageID = returnMessage.messageID;
+            });
+        }
+        console.log("message after finalizeLikeSticker %o", this.messages[threadID]);
+        this.likeStickerTrackerId = ""; 
+        this.emit("change");
+    }
+    
+    likeStickerTrackerId = "";
+    enqueueLikeSticker(payload: any) {
+        var {threadID, stickerID} = payload;
+        console.log("chatstore: enqueueLikeSticker %s,%s", threadID, stickerID);
+        if(this.likeStickerTrackerId == "") {
+            this.likeStickerTrackerId = "sending-inprogress-" + (this.localGUID++);
+        }
+        
+        if (!this.messages[threadID]) {
+            this.messages[threadID] = new Array<string>();
+        }
+        if(stickerID == 0){
+            console.log("chatstore: enqueueLikeSticker, remove sticker %s,%s", threadID, stickerID);
+            this.messages[threadID] = this.messages[threadID].filter(t => t.messageID != this.likeStickerTrackerId);
+            this.emit("change");
+            return;
+        }
+        var message = this.messages[threadID].find(t => t.messageID == this.likeStickerTrackerId);
+        if(message == null){
+            message = {messageID: this.likeStickerTrackerId, 
+                senderID: this.currentUser.userID, 
+                threadID: threadID, 
+                sticker: stickerID
+            };
+            console.log("chatstore: enqueueLikeSticker, add sticker %s,%s", threadID, stickerID);
+            this.messages[threadID].push(message);
+        } else {
+            console.log("chatstore: enqueueLikeSticker, update sticker %s,%s", threadID, stickerID);
+            message.sticker = stickerID;
+        }
         this.emit("change");
     }
     
