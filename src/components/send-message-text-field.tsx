@@ -27,13 +27,14 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
 		this.handleTextChange = this.handleTextChange.bind(this);
 		this.handleOnBlur = this.handleOnBlur.bind(this);
 		this.handleEnterKey = this.handleEnterKey.bind(this);
-		this.handleMouseDown = this.handleMouseDown.bind(this);
-		this.handleMouseUp = this.handleMouseUp.bind(this);
+		this.handleLikeButtonMouseDown = this.handleLikeButtonMouseDown.bind(this);
+		this.handleLikeButtonMouseUp = this.handleLikeButtonMouseUp.bind(this);
     }
 
 	mouseDownTimer: any = null;
 	likeSticker:number = 0;
-	handleMouseDown() {
+	handleLikeButtonMouseDown() {
+		var threadID = this.props.currentFriend.userID;
 		var stickers = [369239263222822,// 35
 			369239343222814,// 84
 			369239383222810// 120
@@ -42,6 +43,7 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
 		var interval = 800;
 		this.likeSticker = stickers[i];
 		console.log("sticker...%d", this.likeSticker);
+		ChatActions.enqueueLikeSticker(threadID, this.likeSticker);
 		this.mouseDownTimer = setInterval(() => {
 			i++;
 			if (i > 2) {
@@ -49,16 +51,20 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
 				this.likeSticker = 0;
 				clearInterval(this.mouseDownTimer);
 				console.log("sticker...%d", this.likeSticker);
+				ChatActions.enqueueLikeSticker(threadID, this.likeSticker);
 			} else {
 				this.likeSticker = stickers[i];
 				console.log("sticker...%d", this.likeSticker);
+				ChatActions.enqueueLikeSticker(threadID, this.likeSticker);
 			}
 		}, interval);
 	}
 
-	handleMouseUp() {
+	handleLikeButtonMouseUp() {
+		var threadID = this.props.currentFriend.userID;
 		clearInterval(this.mouseDownTimer);
 		console.log("final sticker...%d", this.likeSticker);
+		ChatActions.finalizeLikeSticker(threadID, this.likeSticker);
 	}
 
 	handleTextChange() {
@@ -107,7 +113,7 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
 						rowsMax={2}
 						style={{ flex: 2 }}></TextField>
 					<IconButton onClick={this.handleSendMessage} ><FontIcon className="fa fa-paper-plane fa-2" /></IconButton>
-					<IconButton onMouseDown={this.handleMouseDown} onMouseUp={this.handleMouseUp} ><FontIcon className="fa fa-thumbs-o-up fa-2" /></IconButton>
+					<IconButton onMouseDown={this.handleLikeButtonMouseDown} onMouseUp={this.handleLikeButtonMouseUp} ><FontIcon className="fa fa-thumbs-o-up fa-2" /></IconButton>
 			</Hbox>);
 	}
 }
