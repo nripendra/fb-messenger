@@ -52,6 +52,8 @@
 
 /// <reference path="../../src/services/chatservice.ts" />
 
+/// <reference path="../../src/services/emoji-map.ts" />
+
 /// <reference path="../../src/services/loginservice.ts" />
 
 /// <reference path="../../src/services/string-score.ts" />
