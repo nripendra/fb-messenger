@@ -1,6 +1,8 @@
+/// <reference path="../../typings/tsd.d.ts" />
 import * as React from "react";
 import {Hbox, Vbox} from "./layout";
 import ChatActions from "../actions/chatactions";
+import emoji from "../services/emoji-map";
 
 const FontIcon = require("material-ui/lib/font-icon");
 const IconButton = require("material-ui/lib/icon-button");
@@ -11,6 +13,9 @@ const CardHeader = Cards.CardHeader;
 const CardActions = Cards.CardActions;
 const CardText = Cards.CardText;
 const CardMedia = Cards.CardMedia;
+const ListItem = require('material-ui/lib/lists/list-item');
+const Paper = require('material-ui/lib/paper');
+const Popover = require('material-ui/lib/popover/popover');
 
 export class SendMessageTextFieldProps {
     currentFriend: any;
@@ -20,15 +25,32 @@ export class SendMessageTextFieldProps {
 }
 
 export default class SendMessageTextField extends React.Component<SendMessageTextFieldProps, any> {
+	emojies:string;
 	constructor(props: SendMessageTextFieldProps) {
         super();
         this.props = props;
+		this.emojies = `😄,😃,😊,☺,😉,😍,😘,😚,😜,😝,😳,😁,😔,😌,😒,😞,😣,😢,😂,😭,😪,😥,😰,😓,😩,😫,😨,😱,😠,😡,😤,😖,😆,😷,😵,😲,
+		👿,😏,👲,👳,👮,👷,💂,👶,👦,👧,👨,👩,👴,👵,👱,👼,👸,
+		💛,💙,💜,💚,❤,💔,💗,💓,💖,💞,💘,💌,💋,💍,💎,
+		💐,🌸,🌷,🍀,🌹,🌻,🌺,🍁,🍃,🍂,🌾,🌵,🌴,🌱,
+		🐶,🐺,🐱,🐭,🐹,🐰,🐸,🐯,🐨,🐻,🐷,🐮,🐗,🐵,🐒,
+		🐴,🐑,🐘,🐧,🐦,🐥,🐔,🐍,🐛,🐙,🐚,🐠,🐟,🐬,🐳,🐎,🐡,🐫,🐩,🐾,
+		🎩,👑,👒,👟,👡,👠,👢,👕,👔,👗,👘,👙,🌂,💄,💼,👜,🎀,🎍,💝,🎎,🎒,🎓,🎏,🎐,🎃,👻,🎅,🎄,🎁,	🎉,🎈,🎌,
+		🎥,📷,	📼,	💿,	📀,	💽,	💾,	💻,	📱,	☎,📞,📠,📡,📺,📻,🔈,🔔,📢,📣,
+		🔓,🔒,🔏,🔐,🔑,	🔎,💡,🔍,🛀,🚽,🔨,🚬,💣,🔫,💊,💉,💰,💴,💵,📲,
+		☕,🍵,🍶,🍺,🍻,🍸,🍴,🍔,🍟,🍝,🍛,🍱,🍣,🍙,🍘,🍚,🍜,🍲,🍢,🍡, 🍳,🍞,🍦,🍧,🍰,🍎,🍊,🍉,🍓,🍆,🍅,
+		⛵,🚤,🚀,✈,💺,🚉,🚄,🚅,🚃,🚌,🚙,🚗,🚕,🚚,🚓,🚒,🚑,🚲,💈,🚏,🎫,🚥,⚠,🚧,🔰,⛽,♨,
+		🎭, 🏠, 🏡,🏫,🏢,🏣,🏥,🏦,🏪,🏩,🏨,💒,⛪,🏬,🌇,🌆,🏯,🏰,⛺,🏭,🗼,🗻,🌄,🌅,🌃,🗽,🎡,⛲,🎢,🚢,
+		🎨,🎬,🎤,🎧,🎼,🎵,🎶,🎺,🎷,🎸,🌙,⭐,☀,☁,⚡,☔,⛄,🌀,🌈,🌊,✉,📩,📨,📫,📪,📬,📭,📮,📝,✂,📖,
+		👾,🀄,🎯,🏈,🏀,⚽,⚾,🎾,🎱,⛳,🏁,🏆,🎿,👎,👌,💀,👽,🐼,👍,🔥,✨,🌟,💢,💦,💧,💤,💨,👂,👀,👃,👅,👄`;
 		this.handleSendMessage = this.handleSendMessage.bind(this);
 		this.handleTextChange = this.handleTextChange.bind(this);
 		this.handleOnBlur = this.handleOnBlur.bind(this);
 		this.handleEnterKey = this.handleEnterKey.bind(this);
 		this.handleLikeButtonMouseDown = this.handleLikeButtonMouseDown.bind(this);
 		this.handleLikeButtonMouseUp = this.handleLikeButtonMouseUp.bind(this);
+		this.handleEmojiOpen = this.handleEmojiOpen.bind(this);
+		this.handleEmojiClose = this.handleEmojiClose.bind(this);
     }
 
 	mouseDownTimer: any = null;
@@ -66,6 +88,23 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
 		console.log("final sticker...%d", this.likeSticker);
 		ChatActions.finalizeLikeSticker(threadID, this.likeSticker);
 	}
+	
+	handleEmojiOpen(event: any) {
+		this.setState({showEmojiPanel: true, 
+			anchorEl: event.currentTarget,
+			anchorOrigin:{horizontal:'left', vertical:'top'},
+      		targetOrigin:{horizontal:'left', vertical:'top'}
+		});
+	}
+	
+	handleEmojiClose() {
+		this.setState({showEmojiPanel: false});
+	}
+	
+	handleAddEmoji(emoji: string){
+		var message = ((this.refs["messageField"] as any).getValue() || "") + emoji;
+		(this.refs["messageField"] as any).setValue(message);
+	}
 
 	handleTextChange() {
 		var message = (this.refs["messageField"] as any).getValue() || "";
@@ -100,6 +139,7 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
 	}
 
 	render() {
+		var state = this.state || {};
 		return (<Hbox style={{ margin: 0, padding: 0 }}>
 					<TextField
 						ref="messageField"
@@ -111,8 +151,22 @@ export default class SendMessageTextField extends React.Component<SendMessageTex
 						multiLine={true}
 						rows={1}
 						rowsMax={2}
-						style={{ flex: 2 }}></TextField>
+						style={{ flex: 2, fontFamily: "'Segoe UI Emoji', 'Segoe UI Symbol'" }}></TextField>
 					<IconButton onClick={this.handleSendMessage} ><FontIcon className="fa fa-paper-plane fa-2" /></IconButton>
+					 <Popover open={state.showEmojiPanel === true}
+						anchorEl={state.anchorEl}
+						anchorOrigin={state.anchorOrigin}
+						targetOrigin={state.targetOrigin}
+						onRequestClose={this.handleEmojiClose} 
+						style={{width:400, height:400}}
+						>
+						<div style={{padding:20}}>
+						{this.emojies.split(",").map((x) => {
+									return <IconButton onClick={this.handleAddEmoji.bind(this, x)} iconClassName={'em emj'+ emoji[x]}><span style={{display: "none"}}>{x}</span></IconButton>
+								 })}
+						</div>
+					</Popover>
+					<IconButton onClick={this.handleEmojiOpen}><FontIcon className="fa fa-smile-o notification" /></IconButton>
 					<IconButton onMouseDown={this.handleLikeButtonMouseDown} onMouseUp={this.handleLikeButtonMouseUp} ><FontIcon className="fa fa-thumbs-o-up fa-2" /></IconButton>
 			</Hbox>);
 	}
