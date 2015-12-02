@@ -6,18 +6,21 @@ import Emojify from './emojify';
 
 const Avatar = require('material-ui/lib/avatar');
 
-export class MessageItemProps {
+export interface MessageItemProps {
     message: any;
     currentFriend: any;
 	currentUser: any;
+	onImageClick?: Function;
 }
 
-export class MessageContentProps {
+export interface MessageContentProps {
 	message: any;
 	className: string;
+	onImageClick?: Function;
 }
 
 export class MessageContent extends React.Component<MessageContentProps, any> {
+	props: MessageContentProps;
 	constructor(props: MessageContentProps) {
         super();
         this.props = props;
@@ -39,6 +42,8 @@ export class MessageContent extends React.Component<MessageContentProps, any> {
 				{this.props.message.attachments.map((attachment:any) => {
 					if(attachment.type == "sticker") {
 						return (<img src={attachment.url} height={attachment.height} width={attachment.width} />);	
+					} else if(attachment.type == "photo") {
+						return (<img src={attachment.previewUrl} height={attachment.previewHeight} width={attachment.previewWidth} onClick={this.props.onImageClick.bind(null, attachment)} />);	
 					}
 					//empty div for now..
 					return <div />
@@ -59,6 +64,7 @@ export class MessageContent extends React.Component<MessageContentProps, any> {
 }
 
 export default class MessageItem extends React.Component<MessageItemProps, any> {
+	props: MessageItemProps;
     constructor(props: MessageItemProps) {
         super();
         this.props = props;
@@ -89,7 +95,7 @@ export default class MessageItem extends React.Component<MessageItemProps, any> 
 		
 		return (<Hbox style={{'justifyContent':justifyContent}}>
 					{leftAvatar}
-					<MessageContent className={className} message={message}  />
+					<MessageContent className={className} message={message} onImageClick={this.props.onImageClick}  />
 					{rightAvatar}
 				</Hbox>);
     }
