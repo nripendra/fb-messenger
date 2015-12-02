@@ -58,7 +58,7 @@ export default class LoginStore extends Store {
             console.log("done login!!");
             this.emit('change');
         }.bind(this)).catch(function(error: string) {
-            console.log(error);
+            console.error(error);
             this.isAuthenticated = false;
             this.isInProgress = false;
             this.errors = { username: "", password: "", credential: "Invalid username/password" };
