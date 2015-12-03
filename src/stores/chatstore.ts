@@ -15,6 +15,7 @@ export default class ChatStore extends Store {
     typingTimers: { [chatThreadId: string]: any };
     typingEnders: { [chatThreadId: string]: Function };
     friendListFilterText: string;
+    imageToView: any
 
     constructor() {
         super();
@@ -36,7 +37,8 @@ export default class ChatStore extends Store {
             "endTypingIndicator": "endTypingIndicator",
             "filterFriendList": "filterFriendList",
             "enqueueLikeSticker": "enqueueLikeSticker",
-            "finalizeLikeSticker": "finalizeLikeSticker"
+            "finalizeLikeSticker": "finalizeLikeSticker",
+            "showImage": "showImage"
         };
     }
 
@@ -216,6 +218,11 @@ export default class ChatStore extends Store {
             console.log("chatstore: enqueueLikeSticker, update sticker %s,%s", threadID, stickerID);
             message.sticker = stickerID;
         }
+        this.emit("change");
+    }
+    
+    showImage(imageInfo: any) {
+        this.imageToView = imageInfo;
         this.emit("change");
     }
     

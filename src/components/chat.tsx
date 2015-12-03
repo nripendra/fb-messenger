@@ -10,6 +10,7 @@ import connectToStore from '../decorators/connectToStores';
 
 import FriendList from './friendlist';
 import Conversation from './conversation';
+import ImageViewer from "./image-viewer";
 
 export class ChatProps {
     api: any;
@@ -30,11 +31,14 @@ export default class Chat extends React.Component<ChatProps, any> {
         var currentUser = AppStores.chatStore.currentUser;
         var messages = AppStores.chatStore.messages[currentFriend ? currentFriend.userID : ""] || [];
         var friendListFilterText = AppStores.chatStore.friendListFilterText;
+        var image = AppStores.chatStore.imageToView;
+        
         return (<Hbox>
                   <Vbox>
                     <FriendList friendList={friendList} currentFriend={currentFriend} friendListFilterText={friendListFilterText} />
                   </Vbox>
                   <Conversation messages={messages} currentUser={currentUser} currentFriend={currentFriend} />
+                  <ImageViewer imageInfo={image} />
             </Hbox>);
     }
 }

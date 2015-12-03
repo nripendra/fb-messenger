@@ -3,6 +3,7 @@ import * as React from 'react';
 import {Hbox, Vbox} from './layout';
 
 import Emojify from './emojify';
+import ChatActions from '../actions/chatactions';
 
 const Avatar = require('material-ui/lib/avatar');
 
@@ -10,13 +11,11 @@ export interface MessageItemProps {
     message: any;
     currentFriend: any;
 	currentUser: any;
-	onImageClick?: Function;
 }
 
 export interface MessageContentProps {
 	message: any;
 	className: string;
-	onImageClick?: Function;
 }
 
 export class MessageContent extends React.Component<MessageContentProps, any> {
@@ -43,7 +42,10 @@ export class MessageContent extends React.Component<MessageContentProps, any> {
 					if(attachment.type == "sticker") {
 						return (<img src={attachment.url} height={attachment.height} width={attachment.width} />);	
 					} else if(attachment.type == "photo") {
-						return (<img src={attachment.previewUrl} height={attachment.previewHeight} width={attachment.previewWidth} onClick={this.props.onImageClick.bind(null, attachment)} />);	
+						return (<img src={attachment.previewUrl} 
+									 height={attachment.previewHeight} 
+									 width={attachment.previewWidth}
+									 onClick={() => {ChatActions.showImage(attachment);}} />);	
 					}
 					//empty div for now..
 					return <div />
@@ -95,7 +97,7 @@ export default class MessageItem extends React.Component<MessageItemProps, any> 
 		
 		return (<Hbox style={{'justifyContent':justifyContent}}>
 					{leftAvatar}
-					<MessageContent className={className} message={message} onImageClick={this.props.onImageClick}  />
+					<MessageContent className={className} message={message} />
 					{rightAvatar}
 				</Hbox>);
     }
