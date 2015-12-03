@@ -18,6 +18,10 @@
 
 /// <reference path="../../src/actions/loginactions.ts" />
 
+/// <reference path="../../src/decorators/connectToStores.tsx" />
+
+/// <reference path="../../src/decorators/sortAndFilterFriendList.tsx" />
+
 /// <reference path="../../src/components/app.tsx" />
 
 /// <reference path="../../src/components/auto-updater.tsx" />
@@ -45,10 +49,6 @@
 /// <reference path="../../src/components/send-message-text-field.tsx" />
 
 /// <reference path="../../src/components/typing-indicator.tsx" />
-
-/// <reference path="../../src/decorators/connectToStores.tsx" />
-
-/// <reference path="../../src/decorators/sortAndFilterFriendList.tsx" />
 
 /// <reference path="../../src/services/auto-updateservice.ts" />
 

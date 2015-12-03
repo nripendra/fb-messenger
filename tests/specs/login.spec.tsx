@@ -7,6 +7,7 @@ import Login from '../../src/components/login';
 import FriendList from '../../src/components/friendlist';
 import MessageItem from '../../src/components/message-item';
 import Conversation from "../../src/components/conversation";
+import ConversationHistory from "../../src/components/conversation-history";
 import AppStores from '../../src/appstores';
 import LoginActions from '../../src/actions/loginactions';
 import LoginService from '../../src/services/loginservice';
@@ -14,6 +15,7 @@ import ChatStore from '../../src/stores/chatstore';
 import ChatActions from '../../src/actions/chatactions';
 import SendMessageTextField from "../../src/components/send-message-text-field";
 import TypingIndicator from '../../src/components/typing-indicator';
+import ImageViewer from '../../src/components/image-viewer';
 
 const TextField = require("material-ui/lib/text-field");
 
@@ -262,7 +264,7 @@ describe("fb-messenger", () => {
             var sticker = ReactTestUtils.scryRenderedDOMComponentsWithTag(messageItem, "img");
             expect(sticker.length).toBe(1);
         });
-        
+            
         it("should show the emoji icon for emoticons",() => {
             var message = {'senderID': '1' ,'messageID':'1','body': 'Hello world <3'};
             var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{userID: '1'}} currentUser={{userID: '10'}} />, document.getElementById('fb-messenger'));
@@ -632,6 +634,52 @@ describe("fb-messenger", () => {
                 expect(AppStores.chatStore.messages["1"].length).toBe(0);
             });
         });
+        
+        describe("feat: add support for receving image", () => {
+            describe("message-item", () => {
+                it("should be able to show preview image if attachment type is photo", function(){
+                    var attachments = new Array<any>({type:"photo",previewUrl: "http://sticker.com/sticker.jpg", previewWidth: 200, previewHeight:200});
+                    var message = {'senderID': '1' ,'messageID':'1','body': '', attachments: attachments};
+                    var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{userID: '1'}} currentUser={{userID: '10'}} />, document.getElementById('fb-messenger'));
+                    var photo = ReactTestUtils.scryRenderedDOMComponentsWithTag(messageItem, "img");
+                    expect(photo.length).toBe(1); 
+                });
+            });
+            
+            // it("should be able to show large photo when image is clicked", function(cb){
+            //      var api = {
+            //         getCurrentUserID: ()=> { return 10;},
+            //         getUserInfo: ()=> { return 10;},
+            //         markAsRead: ()=> {return;},
+            //         getFriendsList: ()=> {return;},
+            //         setOptions: ()=> {return;},
+            //         getOnlineUsers: ()=> {return;},
+            //         sendMessage: ()=>{return;},
+            //         sendTypingIndicator: ()=>{return;}
+            //     };
+            //     (global as any).electronRequire = ()=>{return {
+            //         getCurrentWindow: function(){
+            //             return {};
+            //         }
+            //     }};
+            //     var attachments = new Array<any>({type:"photo",previewUrl: "http://sticker.com/sticker.jpg", previewWidth: 200, previewHeight:200, url: "http://sticker.com/sticker.jpg", width: 200, height:200});
+            //     var message = {'senderID': '1' ,'messageID':'1','body': '', attachments: attachments};
+            //     AppStores.chatStore.messages = {'1': [message]};
+            //     AppStores.chatStore.currentUser = {userID: '10'};
+            //     AppStores.chatStore.currentFriend = {userID: '1'};
+            //     var chat = ReactDom.render(<Chat api={api} store={AppStores.chatStore} />, document.getElementById('fb-messenger'));
+            //     //var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{userID: '1'}} currentUser={{userID: '10'}} />, document.getElementById('fb-messenger'));
+            //     var photo = ReactTestUtils.scryRenderedDOMComponentsWithTag(chat, "img");
+            //     expect(photo.length).toBe(1); 
+            //     ReactTestUtils.Simulate.click(ReactDom.findDOMNode(photo[0]));
+            //     console.log("showImage...");
+            //     ChatActions.showImage(attachments[0]);
+                
+            //     setTimeout(()=>{
+            //         cb();
+            //     },500);
+            // });
+        })
     });
     
     beforeEach(function() {
@@ -651,6 +699,7 @@ describe("fb-messenger", () => {
     });
 
     afterEach(function(done) {
+        console.log("after......")
         ReactDom.unmountComponentAtNode(document.getElementById('fb-messenger'))
         React = null;
         ReactTestUtils = null;

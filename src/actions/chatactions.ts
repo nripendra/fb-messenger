@@ -37,5 +37,8 @@ export default {
     finalizeLikeSticker(threadID: string, stickerID: number){
         console.log("chatAction: finalizeLikeSticker : %s, %d", threadID, stickerID);
         dispatcher.dispatch("finalizeLikeSticker", {threadID, stickerID});
+    },
+    showImage(imageInfo: any){
+        dispatcher.dispatch("showImage", imageInfo);
     }
 };
