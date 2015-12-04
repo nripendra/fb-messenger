@@ -17,12 +17,16 @@ function runOnElectron(tests) {
     if (on_travis) {
         args.push('--travis');
     }
-    var proc = spawn(electron, args, {'encoding':'ansi', stdio: [null, null, null, 'ipc']});
-    proc.on('exit', function(){
-        console.log("Exiting...");
+
+    var proc = spawn(electron, args, { 'encoding': 'ansi', stdio: [null, null, null, 'ipc'] });
+
+    proc.on('exit', function (exitCode) {
+        console.log("Exiting... %d", exitCode);
+        process.exit(exitCode);
     });
-    proc.on('message', function(e){
-        console.log(e);
+
+    proc.on('message', function (e) {
+        console.log(e || "");
     });
 }
 
