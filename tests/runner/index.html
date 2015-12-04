@@ -7,13 +7,20 @@
     var Jasmine = require('jasmine');
     var SpecReporter = require('jasmine-spec-reporter');
     var app = require('remote').require('app');
-    var reporter = require('./reporter.js');
+    var ipc = require("electron").ipcRenderer;
   </script>
 </head>
 <body>
   <div id="fb-messenger"></div>
   <script>var jasmine = new Jasmine();
-  jasmine.addReporter(reporter);
+  jasmine.addReporter(new SpecReporter({
+    consoleWrite: function(str){
+      ipc.send('renderer-print-message', str);  
+    },
+    jasmineDone : function(failedSpecs) {
+      ipc.send('renderer-test-result', failedSpecs);  
+    }
+  }));
   jasmine.addSpecFile(path.resolve("./tests/out/tests/specs/login.spec.js"));
   jasmine.execute();
   </script>
