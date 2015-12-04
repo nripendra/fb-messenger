@@ -1,4 +1,3 @@
-/// <reference path="../../tools/typings/jasmine/jasmine.d.ts"/>
 import App from '../../src/components/app';
 import Chat from '../../src/components/chat';
 import AutoUpdater from "../../src/components/auto-updater";
@@ -18,8 +17,6 @@ import TypingIndicator from '../../src/components/typing-indicator';
 import ImageViewer from '../../src/components/image-viewer';
 
 const TextField = require("material-ui/lib/text-field");
-
-import * as jsdom from 'jsdom';
 let React: any = null;
 let ReactTestUtils: any = null;
 let ReactDom: any = null;
@@ -83,21 +80,18 @@ describe("fb-messenger", () => {
         });
 
         it("should call authenticate when login button is clicked, and form is valid", () => {
-            //jsdom doesn't support html5 checkValidity..
-            //tried pollyfilling using H5F, but react doesn't like it.
-            HTMLFormElement.prototype.checkValidity = () => true;
 
             spyOn(LoginActions, 'authenticate');
             var loginForm = ReactDom.render(<Login store={AppStores.loginStore} />, document.getElementById('fb-messenger'));
-            //console.log(ReactDom.findDOMNode(loginForm.refs["btnLogin"]));
+            var usernameTextField = loginForm.refs["username"] as any;
+            var passwordTextField = loginForm.refs["password"] as any;            
+            usernameTextField.setValue("myuser@123.com");
+            passwordTextField.setValue("mypassword");           
             ReactTestUtils.Simulate.click(ReactDom.findDOMNode(loginForm.refs["btnLogin"]).firstChild);
             expect(LoginActions.authenticate).toHaveBeenCalled();
         });
 
         it("should call setErrors when login button is clicked, and form is invalid", () => {
-            //jsdom doesn't support html5 checkValidity..
-            //tried pollyfilling using H5F, but react doesn't like it.
-            HTMLFormElement.prototype.checkValidity = () => false;
 
             spyOn(LoginActions, 'setErrors');
 
@@ -498,89 +492,91 @@ describe("fb-messenger", () => {
         });
     });
     
-    describe("send giant like", ()=>{
-        it("should dispatch enqueueLikeSticker message when pressing mouse button down upon the like icon", () => {
-            var api = {
-                getCurrentUserID: ()=> { return 10;},
-                getUserInfo: ()=> { return 10;},
-                markAsRead: ()=> {return;},
-                getFriendsList: ()=> {return;},
-                setOptions: ()=> {return;},
-                getOnlineUsers: ()=> {return;},
-                sendMessage: ()=>{return;},
-                sendTypingIndicator: ()=>{return;}
-            };
-           AppStores.chatStore.loadFriendList(api);
-
-           spyOn(ChatActions, "enqueueLikeSticker").and.callFake(function() {
-                return;// noop
-           });
-           var sendMessageTextField = ReactDom.render(<SendMessageTextField 
-                                                            currentFriend={{userID: '1', profilePicture: 'http://propic1.com/'}} 
-                                                            currentUser={{userID:'10'}}
-                                                            onTextFieldFocus={()=>{}}
-                                                            onTextFieldBlur={()=>{}} />, 
-                                                            document.getElementById('fb-messenger'));
-           sendMessageTextField.handleLikeButtonMouseDown();
-           
-           expect(ChatActions.enqueueLikeSticker).toHaveBeenCalled();
-        });
-        
-        it("should dispatch multiple enqueueLikeSticker messages when pressing mouse button down upon the like icon continiously", (done: Function) => {
-            var api = {
-                getCurrentUserID: ()=> { return 10;},
-                getUserInfo: ()=> { return 10;},
-                markAsRead: ()=> {return;},
-                getFriendsList: ()=> {return;},
-                setOptions: ()=> {return;},
-                getOnlineUsers: ()=> {return;},
-                sendMessage: ()=>{return;},
-                sendTypingIndicator: ()=>{return;}
-            };
-           AppStores.chatStore.loadFriendList(api);
-
-           spyOn(ChatActions, "enqueueLikeSticker").and.callFake(function() {
-                return;// noop
-           });
-           var sendMessageTextField = ReactDom.render(<SendMessageTextField 
-                                                            currentFriend={{userID: '1', profilePicture: 'http://propic1.com/'}} 
-                                                            currentUser={{userID:'10'}}
-                                                            onTextFieldFocus={()=>{}}
-                                                            onTextFieldBlur={()=>{}} />, 
-                                                            document.getElementById('fb-messenger'));
-           sendMessageTextField.handleLikeButtonMouseDown();
-           
-           setTimeout(() =>{
-                expect((ChatActions.enqueueLikeSticker as any).calls.count()).toBeGreaterThan(2);
-                done();
-           }, 1600);
-        });
-        
-        it("should dispatch finalizeLikeSticker message when mouse button is released upon the like icon", () => {
-            var api = {
-                getCurrentUserID: ()=> { return 10;},
-                getUserInfo: ()=> { return 10;},
-                markAsRead: ()=> {return;},
-                getFriendsList: ()=> {return;},
-                setOptions: ()=> {return;},
-                getOnlineUsers: ()=> {return;},
-                sendMessage: ()=>{return;},
-                sendTypingIndicator: ()=>{return;}
-            };
-           AppStores.chatStore.loadFriendList(api);
-
-           spyOn(ChatActions, "finalizeLikeSticker").and.callFake(function() {
-                return;// noop
-           });
-           var sendMessageTextField = ReactDom.render(<SendMessageTextField 
-                                                            currentFriend={{userID: '1', profilePicture: 'http://propic1.com/'}} 
-                                                            currentUser={{userID:'10'}}
-                                                            onTextFieldFocus={()=>{}}
-                                                            onTextFieldBlur={()=>{}} />, 
-                                                            document.getElementById('fb-messenger'));
-           sendMessageTextField.handleLikeButtonMouseUp();
-           
-           expect(ChatActions.finalizeLikeSticker).toHaveBeenCalled();
+    describe("feat: send giant like", ()=> {
+        describe("like button", ()=>{
+            it("should dispatch enqueueLikeSticker message when pressing mouse button down upon the like icon", () => {
+                var api = {
+                    getCurrentUserID: ()=> { return 10;},
+                    getUserInfo: ()=> { return 10;},
+                    markAsRead: ()=> {return;},
+                    getFriendsList: ()=> {return;},
+                    setOptions: ()=> {return;},
+                    getOnlineUsers: ()=> {return;},
+                    sendMessage: ()=>{return;},
+                    sendTypingIndicator: ()=>{return;}
+                };
+                AppStores.chatStore.loadFriendList(api);
+                
+                spyOn(ChatActions, "enqueueLikeSticker").and.callFake(function() {
+                    return;// noop
+                });
+                var sendMessageTextField = ReactDom.render(<SendMessageTextField 
+                                                                currentFriend={{userID: '1', profilePicture: 'http://propic1.com/'}} 
+                                                                currentUser={{userID:'10'}}
+                                                                onTextFieldFocus={()=>{}}
+                                                                onTextFieldBlur={()=>{}} />, 
+                                                                document.getElementById('fb-messenger'));
+                sendMessageTextField.handleLikeButtonMouseDown();
+                
+                expect(ChatActions.enqueueLikeSticker).toHaveBeenCalled();
+            });
+            
+            it("should dispatch multiple enqueueLikeSticker messages when pressing mouse button down upon the like icon continiously", (done: Function) => {
+                var api = {
+                    getCurrentUserID: ()=> { return 10;},
+                    getUserInfo: ()=> { return 10;},
+                    markAsRead: ()=> {return;},
+                    getFriendsList: ()=> {return;},
+                    setOptions: ()=> {return;},
+                    getOnlineUsers: ()=> {return;},
+                    sendMessage: ()=>{return;},
+                    sendTypingIndicator: ()=>{return;}
+                };
+                AppStores.chatStore.loadFriendList(api);
+                
+                spyOn(ChatActions, "enqueueLikeSticker").and.callFake(function() {
+                    return;// noop
+                });
+                var sendMessageTextField = ReactDom.render(<SendMessageTextField 
+                                                                currentFriend={{userID: '1', profilePicture: 'http://propic1.com/'}} 
+                                                                currentUser={{userID:'10'}}
+                                                                onTextFieldFocus={()=>{}}
+                                                                onTextFieldBlur={()=>{}} />, 
+                                                                document.getElementById('fb-messenger'));
+                sendMessageTextField.handleLikeButtonMouseDown();
+                
+                setTimeout(() =>{
+                    expect((ChatActions.enqueueLikeSticker as any).calls.count()).toBeGreaterThan(2);
+                    done();
+                }, 1600);
+            });
+            
+            it("should dispatch finalizeLikeSticker message when mouse button is released upon the like icon", () => {
+                var api = {
+                    getCurrentUserID: ()=> { return 10;},
+                    getUserInfo: ()=> { return 10;},
+                    markAsRead: ()=> {return;},
+                    getFriendsList: ()=> {return;},
+                    setOptions: ()=> {return;},
+                    getOnlineUsers: ()=> {return;},
+                    sendMessage: ()=>{return;},
+                    sendTypingIndicator: ()=>{return;}
+                };
+                AppStores.chatStore.loadFriendList(api);
+                
+                spyOn(ChatActions, "finalizeLikeSticker").and.callFake(function() {
+                    return;// noop
+                });
+                var sendMessageTextField = ReactDom.render(<SendMessageTextField 
+                                                                currentFriend={{userID: '1', profilePicture: 'http://propic1.com/'}} 
+                                                                currentUser={{userID:'10'}}
+                                                                onTextFieldFocus={()=>{}}
+                                                                onTextFieldBlur={()=>{}} />, 
+                                                                document.getElementById('fb-messenger'));
+                sendMessageTextField.handleLikeButtonMouseUp();
+                
+                expect(ChatActions.finalizeLikeSticker).toHaveBeenCalled();
+            });
         });
         
         describe("enqueueLikeSticker", ()=> {
@@ -636,7 +632,7 @@ describe("fb-messenger", () => {
         });
         
         describe("feat: add support for receving image", () => {
-            describe("message-item", () => {
+            describe("message-item component", () => {
                 it("should be able to show preview image if attachment type is photo", function(){
                     var attachments = new Array<any>({type:"photo",previewUrl: "http://sticker.com/sticker.jpg", previewWidth: 200, previewHeight:200});
                     var message = {'senderID': '1' ,'messageID':'1','body': '', attachments: attachments};
@@ -646,52 +642,82 @@ describe("fb-messenger", () => {
                 });
             });
             
-            // it("should be able to show large photo when image is clicked", function(cb){
-            //      var api = {
-            //         getCurrentUserID: ()=> { return 10;},
-            //         getUserInfo: ()=> { return 10;},
-            //         markAsRead: ()=> {return;},
-            //         getFriendsList: ()=> {return;},
-            //         setOptions: ()=> {return;},
-            //         getOnlineUsers: ()=> {return;},
-            //         sendMessage: ()=>{return;},
-            //         sendTypingIndicator: ()=>{return;}
-            //     };
-            //     (global as any).electronRequire = ()=>{return {
-            //         getCurrentWindow: function(){
-            //             return {};
-            //         }
-            //     }};
-            //     var attachments = new Array<any>({type:"photo",previewUrl: "http://sticker.com/sticker.jpg", previewWidth: 200, previewHeight:200, url: "http://sticker.com/sticker.jpg", width: 200, height:200});
-            //     var message = {'senderID': '1' ,'messageID':'1','body': '', attachments: attachments};
-            //     AppStores.chatStore.messages = {'1': [message]};
-            //     AppStores.chatStore.currentUser = {userID: '10'};
-            //     AppStores.chatStore.currentFriend = {userID: '1'};
-            //     var chat = ReactDom.render(<Chat api={api} store={AppStores.chatStore} />, document.getElementById('fb-messenger'));
-            //     //var messageItem = ReactDom.render(<MessageItem message={message} currentFriend={{userID: '1'}} currentUser={{userID: '10'}} />, document.getElementById('fb-messenger'));
-            //     var photo = ReactTestUtils.scryRenderedDOMComponentsWithTag(chat, "img");
-            //     expect(photo.length).toBe(1); 
-            //     ReactTestUtils.Simulate.click(ReactDom.findDOMNode(photo[0]));
-            //     console.log("showImage...");
-            //     ChatActions.showImage(attachments[0]);
+            describe("Chat component", () => {
+                it("should be able to show large photo when image is clicked", function(){
+                    var api = {
+                        getCurrentUserID: ()=> { return 10;},
+                        getUserInfo: ()=> { return 10;},
+                        markAsRead: ()=> {return;},
+                        getFriendsList: ()=> {return;},
+                        setOptions: ()=> {return;},
+                        getOnlineUsers: ()=> {return;},
+                        sendMessage: ()=>{return;},
+                        sendTypingIndicator: ()=>{return;}
+                    };
+                    (global as any).electronRequire = ()=>{return {
+                        getCurrentWindow: function(){
+                            return {};
+                        }
+                    }};
+                    var attachments = new Array<any>({type:"photo",previewUrl: "http://sticker.com/sticker.jpg", previewWidth: 200, previewHeight:200, url: "http://sticker.com/sticker.jpg", width: 200, height:200});
+                    var message = {'senderID': '1' ,'messageID':'1','body': '', attachments: attachments};
+                    AppStores.chatStore.messages = {'1': [message]};
+                    AppStores.chatStore.currentUser = {userID: '10'};
+                    AppStores.chatStore.currentFriend = {userID: '1'};
+                    var chat = ReactDom.render(<Chat api={api} store={AppStores.chatStore} />, document.getElementById('fb-messenger'));
+                    var photo = ReactTestUtils.scryRenderedDOMComponentsWithTag(chat, "img");
+                    expect(photo.length).toBe(1); 
+                    ReactTestUtils.Simulate.click(ReactDom.findDOMNode(photo[0]));
+                    photo = ReactTestUtils.scryRenderedDOMComponentsWithTag(chat, "img");
+                    expect(photo.length).toBe(2); 
+                });
                 
-            //     setTimeout(()=>{
-            //         cb();
-            //     },500);
-            // });
+                it("should be able to hide large photo when anywhere in image viewer is clicked", function(cb){
+                    document.getElementById('fb-messenger').innerHTML = '';
+                    var api = {
+                        getCurrentUserID: ()=> { return 10;},
+                        getUserInfo: ()=> { return 10;},
+                        markAsRead: ()=> {return;},
+                        getFriendsList: ()=> {return;},
+                        setOptions: ()=> {return;},
+                        getOnlineUsers: ()=> {return;},
+                        sendMessage: ()=>{return;},
+                        sendTypingIndicator: ()=>{return;}
+                    };
+                    (global as any).electronRequire = ()=>{return {
+                        getCurrentWindow: function(){
+                            return {};
+                        }
+                    }};
+                    var attachments = new Array<any>({type:"photo",previewUrl: "http://sticker.com/sticker.jpg", previewWidth: 200, previewHeight:200, url: "http://sticker.com/sticker-full.jpg", width: 200, height:200});
+                    var message = {'senderID': '1' ,'messageID':'1','body': '', attachments: attachments};
+                    AppStores.chatStore.imageToView = {};
+                    AppStores.chatStore.messages = {'1': [message]};
+                    AppStores.chatStore.currentUser = {userID: '10'};
+                    AppStores.chatStore.currentFriend = {userID: '1'};
+                    var chat = ReactDom.render(<Chat api={api} store={AppStores.chatStore} />, document.getElementById('fb-messenger'));
+                    var photo = ReactTestUtils.scryRenderedDOMComponentsWithTag(chat, "img");
+                    
+                    
+                    expect(photo.length).toBe(1);
+                    ReactTestUtils.Simulate.click(ReactDom.findDOMNode(photo[0]));
+                    
+                    photo = ReactTestUtils.scryRenderedDOMComponentsWithTag(chat, "img");
+                    expect(photo.length).toBe(2); 
+                    
+                    var imageViewers = ReactTestUtils.scryRenderedComponentsWithType(chat, ImageViewer);
+                    ReactTestUtils.Simulate.click(ReactDom.findDOMNode(imageViewers[0]).firstChild);
+                    
+                    photo = ReactTestUtils.scryRenderedDOMComponentsWithTag(chat, "img");
+                    expect(photo.length).toBe(1); 
+                    
+                    cb();
+                });
+            });
         })
     });
     
     beforeEach(function() {
-    
-        (global as any).document = jsdom.jsdom('<!doctype html><html><body><div id="fb-messenger"></div></body></html>');
-        (global as any).window = document.defaultView;
-        (global as any).Element = (global as any).window.Element;
-        (global as any).HTMLFormElement = (global as any).window.HTMLFormElement;
-        (global as any).navigator = {
-            userAgent: 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36'
-        };
-
         React = require('react');
 
         ReactTestUtils = require('react-addons-test-utils');
@@ -704,13 +730,6 @@ describe("fb-messenger", () => {
         React = null;
         ReactTestUtils = null;
         ReactDom = null;
-        (global as any).document.body.innerHTML = "";
-        (global as any).document = null;
-        (global as any).window = null;
-        (global as any).Element = null;
-        (global as any).navigator = {
-            userAgent: 'node.js'
-        };
         setTimeout(done)
     });
 });

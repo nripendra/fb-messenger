@@ -1,0 +1,33 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Shiba Test</title>
+  <script>
+    var path = require('path');
+    var Jasmine = require('jasmine');
+    var SpecReporter = require('jasmine-spec-reporter');
+    var app = require('remote').require('app');
+    var ipc = require("electron").ipcRenderer;
+    var electronRequire = require;
+  </script>
+</head>
+
+<body>
+  <div id="fb-messenger"></div>
+  <script>
+    var jasmine = new Jasmine();
+  jasmine.addReporter(new SpecReporter({
+    consoleWrite: function(str){
+      ipc.send('renderer-print-message', str);  
+    },
+    jasmineDone : function(failedSpecs) {
+      ipc.send('renderer-test-result', failedSpecs);  
+    }
+  }));
+  jasmine.addSpecFile(path.resolve("./tests/out/tests/specs/login.spec.js"));
+  jasmine.execute();
+  </script>
+</body>
+
+</html>
