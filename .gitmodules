@@ -4,3 +4,6 @@
 [submodule "facebook-chat-api"]
 	path = facebook-chat-api
 	url = https://github.com/nripendra/facebook-chat-api.git
+[submodule "jasmine-spec-reporter"]
+	path = jasmine-spec-reporter
+	url = https://github.com/nripendra/jasmine-spec-reporter
