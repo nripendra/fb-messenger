@@ -58,8 +58,12 @@ gulp.task('compile-test', ['copy-jsx-test'], function () {
 gulp.task('test', ['compile-test'], function () {
     process.env.NODE_ENV = 'development';
     global.electronRequire = require;
-    return gulp.src('./tests/out/tests/specs/**/*.js')
-        .pipe(jasmine({ includeStackTrace: true, reporter: new SpecReporter() }));
+    var child = require('child_process').fork('./tests/run.js',[], {stdio: "pipe"});
+    child.on('message', function (data) {
+        console.log('stdout: ' + data);
+    });
+    // return gulp.src('./tests/out/tests/specs/**/*.js')
+    //     .pipe(jasmine({ includeStackTrace: true, reporter: new SpecReporter() }));
 });
 
 /**
