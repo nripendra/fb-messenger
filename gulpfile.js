@@ -55,12 +55,17 @@ gulp.task('compile-test', ['copy-jsx-test'], function () {
         .pipe(gulp.dest("./tests/out/"))
 });
 
-gulp.task('test', ['compile-test'], function () {
+gulp.task('test', ['compile-test'], function (done) {
     process.env.NODE_ENV = 'development';
     global.electronRequire = require;
-    var child = require('child_process').fork('./tests/run.js',[], {stdio: "pipe"});
-    child.on('message', function (data) {
-        console.log('stdout: ' + data);
+    var child = require('child_process').fork('./tests/run.js', [], { stdio: [null, null, null, 'ipc'] });
+
+    child.on('exit', function (code) {
+        if (code > 0) {
+            done('Unit test failed');
+        } else {
+            done();
+        }
     });
     // return gulp.src('./tests/out/tests/specs/**/*.js')
     //     .pipe(jasmine({ includeStackTrace: true, reporter: new SpecReporter() }));
