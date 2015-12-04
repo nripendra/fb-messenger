@@ -3,7 +3,7 @@
 var app = require('app');
 var BrowserWindow = require('browser-window');
 var ipc = require('electron').ipcMain;
-
+var path = require('path');
 var renderer_test_exit_status = 0;
 
 function openElectronWindow() {
