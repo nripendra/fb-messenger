@@ -83,7 +83,10 @@ describe("fb-messenger", () => {
 
             spyOn(LoginActions, 'authenticate');
             var loginForm = ReactDom.render(<Login store={AppStores.loginStore} />, document.getElementById('fb-messenger'));
-            //console.log(ReactDom.findDOMNode(loginForm.refs["btnLogin"]));
+            var usernameTextField = loginForm.refs["username"] as any;
+            var passwordTextField = loginForm.refs["password"] as any;            
+            usernameTextField.setValue("myuser@123.com");
+            passwordTextField.setValue("mypassword");           
             ReactTestUtils.Simulate.click(ReactDom.findDOMNode(loginForm.refs["btnLogin"]).firstChild);
             expect(LoginActions.authenticate).toHaveBeenCalled();
         });
