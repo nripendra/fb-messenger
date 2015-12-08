@@ -15,7 +15,8 @@ export default class ChatStore extends Store {
     typingTimers: { [chatThreadId: string]: any };
     typingEnders: { [chatThreadId: string]: Function };
     friendListFilterText: string;
-    imageToView: any
+    imageToView: any;
+    playNewMessageBeep: boolean;
 
     constructor() {
         super();
@@ -38,7 +39,8 @@ export default class ChatStore extends Store {
             "filterFriendList": "filterFriendList",
             "enqueueLikeSticker": "enqueueLikeSticker",
             "finalizeLikeSticker": "finalizeLikeSticker",
-            "showImage": "showImage"
+            "showImage": "showImage",
+            "playNewMessageBeep": "setPlayNewMessageBeep"
         };
     }
 
@@ -226,6 +228,10 @@ export default class ChatStore extends Store {
         this.emit("change");
     }
     
+    setPlayNewMessageBeep(playNewMessageBeep: boolean) {
+        this.playNewMessageBeep = playNewMessageBeep;
+    }
+    
     listen() {
         console.log("listening to events...");
         this.chatService.listen();
@@ -249,12 +255,15 @@ syscall: "connect"
         }.bind(this));
 
         this.chatService.listener.on('message', function(event: any, stopListening: Function) {
-            var threadID = (event.senderID || "").toString();
+            var senderID = (event.senderID || "").toString();
+            var threadID = senderID;
             if (threadID == this.currentUserId) {
                 threadID = (event.threadID || "").toString();
             }
-
             console.log("listen: message received: %o", event);
+            if(senderID != this.currentUserId) {
+                this.setPlayNewMessageBeep(true);
+            }
             this.addMessage(threadID, event);
             this.emit('change');
         }.bind(this));
