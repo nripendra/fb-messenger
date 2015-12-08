@@ -32,12 +32,16 @@ export default class Chat extends React.Component<ChatProps, any> {
         var messages = AppStores.chatStore.messages[currentFriend ? currentFriend.userID : ""] || [];
         var friendListFilterText = AppStores.chatStore.friendListFilterText;
         var image = AppStores.chatStore.imageToView;
+        var playNewMessageBeep = AppStores.chatStore.playNewMessageBeep; 
         
         return (<Hbox>
                   <Vbox>
                     <FriendList friendList={friendList} currentFriend={currentFriend} friendListFilterText={friendListFilterText} />
                   </Vbox>
-                  <Conversation messages={messages} currentUser={currentUser} currentFriend={currentFriend} />
+                  <Conversation messages={messages} 
+                                currentUser={currentUser} 
+                                currentFriend={currentFriend} 
+                                playNewMessageBeep={playNewMessageBeep} />
                   <ImageViewer imageInfo={image} />
             </Hbox>);
     }
