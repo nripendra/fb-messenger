@@ -40,5 +40,11 @@ export default {
     },
     showImage(imageInfo: any){
         dispatcher.dispatch("showImage", imageInfo);
+    },
+    playNewMessageBeep() {
+        dispatcher.dispatch("playNewMessageBeep", true);
+    },
+    resetPlayNewMessageBeep() {
+        dispatcher.dispatch("playNewMessageBeep", false);
     }
 };
