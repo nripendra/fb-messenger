@@ -3,6 +3,7 @@ import {Hbox, Vbox} from './layout';
 import ConversationHistory from './conversation-history';
 import SendMessageTextField from './send-message-text-field';
 import ChatActions from "../actions/chatactions";
+import Beeper from "./beeper";
 
 const Avatar = require('material-ui/lib/avatar');
 const FontIcon = require('material-ui/lib/font-icon');
@@ -20,6 +21,7 @@ export class ConversationProps {
     messages: any;
     currentFriend: any;
     currentUser: any;
+    playNewMessageBeep: boolean;
 }
 
 export default class Conversation extends React.Component<ConversationProps, any> {
@@ -102,6 +104,7 @@ export default class Conversation extends React.Component<ConversationProps, any
                             onTextFieldBlur = {this.handleTextFieldBlur}
                         />
                     </CardActions>
+                    <Beeper playNewMessageBeep={this.props.playNewMessageBeep} />
             </Card>);
     }
 

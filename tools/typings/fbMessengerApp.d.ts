@@ -26,6 +26,8 @@
 
 /// <reference path="../../src/components/auto-updater.tsx" />
 
+/// <reference path="../../src/components/beeper.tsx" />
+
 /// <reference path="../../src/components/chat.tsx" />
 
 /// <reference path="../../src/components/conversation-history.tsx" />
@@ -57,6 +59,8 @@
 /// <reference path="../../src/services/emoji-map.ts" />
 
 /// <reference path="../../src/services/loginservice.ts" />
+
+/// <reference path="../../src/services/playNote.ts" />
 
 /// <reference path="../../src/services/string-score.ts" />
 
