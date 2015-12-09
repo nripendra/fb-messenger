@@ -10,7 +10,7 @@
 	"startanyshell.shells": [
 		{
 			"description": "ConsoleZ",
-			"command": "start \"%description%\"  \"%HOMEDRIVE%\\ProgramData\\chocolatey\\lib\\ConsoleZ\\tools\\console.exe\""
+			"command": "start \"%description%\"  \"%HOMEDRIVE%\\ProgramData\\chocolatey\\lib\\ConsoleZ\\tools\\console.bat\""
 		},
 		{
 			"description": "Windows Command Prompt",
