@@ -853,6 +853,59 @@ describe("fb-messenger", () => {
         });
     });
     
+    describe("feat: maximize window on successful login", () => {
+        describe("App", () => {
+            it("should maximize current browser window if isAuthenticated is true", () => {
+                var api = {
+                    getCurrentUserID: ()=> { return 10;},
+                    getUserInfo: ()=> { return 10;},
+                    markAsRead: ()=> {return;},
+                    getFriendsList: ()=> {return;},
+                    setOptions: ()=> {return;},
+                    getOnlineUsers: ()=> {return;},
+                    sendMessage: ()=>{return;},
+                    sendTypingIndicator: ()=>{return;}
+                };
+                AppStores.loginStore.api = api;
+                var win = require('remote').getCurrentWindow();
+                win.unmaximize();
+                var myApp = ReactDom.render(<App />, document.getElementById("fb-messenger"));
+                spyOn(win, "maximize").and.callThrough();
+                AppStores.loginStore.isAuthenticated = true;
+                AppStores.loginStore.emit("change");
+                expect(win.maximize).toHaveBeenCalled();    
+            });
+            
+            it("should not maximize current browser window if isAuthenticated is true, but previously had been maximized", () => {
+                var api = {
+                    getCurrentUserID: ()=> { return 10;},
+                    getUserInfo: ()=> { return 10;},
+                    markAsRead: ()=> {return;},
+                    getFriendsList: ()=> {return;},
+                    setOptions: ()=> {return;},
+                    getOnlineUsers: ()=> {return;},
+                    sendMessage: ()=>{return;},
+                    sendTypingIndicator: ()=>{return;}
+                };
+                AppStores.loginStore.api = api;
+                var win = require('remote').getCurrentWindow();
+                win.unmaximize();
+                var myApp = ReactDom.render(<App />, document.getElementById("fb-messenger"));
+                spyOn(win, "maximize").and.callThrough();
+                AppStores.loginStore.isAuthenticated = true;
+                AppStores.loginStore.emit("change");
+                expect(win.maximize).toHaveBeenCalled();
+                
+                win.maximize.calls.reset();  
+                win.unmaximize();
+                AppStores.loginStore.isAuthenticated = true;
+                AppStores.loginStore.emit("change");
+                expect(win.maximize).not.toHaveBeenCalled();
+                expect(win.isMaximized()).toBe(false);    
+            });
+        });
+    });
+    
     beforeEach(function() {
         React = require('react');
 
